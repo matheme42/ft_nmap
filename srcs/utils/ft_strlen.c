@@ -1,4 +1,4 @@
-#include "ft_nmap.h";
+#include "ft_nmap.h"
 
 int	ft_strlen(const char *str)
 {
