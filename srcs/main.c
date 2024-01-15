@@ -28,7 +28,7 @@ void print_devs(pcap_if_t *alldevsp) {
     printf("devs:\n");
     while (dev) {
         if (pcap_lookupnet(dev->name, &netp, &maskp, errbuf)) {
-            printf("Error lookupnet: %s\n", errbuf);
+            fprintf(stderr, "Error lookupnet: %s\n", errbuf);
             dev = dev->next;
             continue;
         }
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     int timeout_limit = 1000; /* In milliseconds */
 
     if (pcap_findalldevs(&alldevsp, error_buffer)) {
-        printf("Error finding devs: %s\n", error_buffer);
+        fprintf(stderr, "Error finding devs: %s\n", error_buffer);
         return 1;
     }
     print_devs(alldevsp);

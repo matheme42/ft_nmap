@@ -39,7 +39,7 @@ char			**ft_strsplit(const char *s, char c, int *len)
 
 	if (s == NULL)
 		return (NULL);
-	if (!(tab = ft_malloc(sizeof(tab) * (nbmots(s, c) + 1))))
+	if (!(tab = ft_malloc(sizeof(char*) * (nbmots(s, c) + 1))))
 		return (NULL);
 	i = 0;
 	j = 0;
