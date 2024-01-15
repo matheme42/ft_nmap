@@ -10,6 +10,10 @@
 #include <strings.h>
 
 
+// malloc, free
+#include <stdlib.h>
+
+
 #include <time.h>
 #include <pcap.h>
 #include <netinet/in.h>
@@ -43,5 +47,22 @@ typedef struct s_data {
     char scanmask; // SYN, NULL, ACK, FIN, XMAS, UDP
 } t_data;
 
+
+// ******************* UTILS SECTIONS ******************* //
+
+int		ft_atoi(const char *str);
+void	ft_bzero(void *s, size_t n);
+char	**ft_strsplit(const char *s, char c, int *len);
+char	*ft_strsub(char const *s, unsigned int start, size_t len);
+void	*ft_malloc(size_t size);
+
+// ****************** PARSING SECTIONS ****************** //
+
+#define MIN_SPEEDUP 1
+#define MAX_SPEEDUP 250
+
+
+void set_speedup_value(char *value, t_data *data);
+void set_ports_value(char *str, t_data *data);
 
 #endif

@@ -20,15 +20,18 @@ INC_PATH= includes
 
 INC= $(INC_PATH)/*
 
-NAME_SRC= main.c
+NAME_SRC= parsing.c parsing_submodule.c
+
+NAME_SRC_UTILS = atoi.c bzero.c ft_split.c ft_strsub.c ft_malloc.c
 
 NAME_SRC_LEN	= $(shell echo -n $(NAME_SRC) | wc -w)
 I				= 
 
 OBJ_NAME		= $(NAME_SRC:.c=.o)
+OBJ_NAME_UTILS	= $(NAME_SRC_UTILS:.c=.o)
 
 
-OBJS = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME))
+OBJS = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME)) $(addprefix $(OBJ_PATH)/utils/,$(OBJ_NAME_UTILS))
 
 DEBUG_FLAG = -Wall -Wextra -Werror #-fsanitize=address
 
@@ -42,10 +45,10 @@ $(NAME) : $(OBJS)
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c $(INC) Makefile
 	@mkdir $(OBJ_PATH) 2> /dev/null || true
+	@mkdir $(OBJ_PATH)/utils 2> /dev/null || true
 	@$(CC) -I $(INC_PATH) -c $< -o $@
 	@$(eval I=$(shell echo $$(($(I)+1))))
 	@printf "\033[2K\r${G}$(DARK_BLUE)>>\t\t\t\t$(I)/$(shell echo $(NAME_SRC_LEN)) ${N}$(BLUE)$<\033[36m \033[0m"
-
 
 clean:
 ifeq ("$(wildcard $(OBJ_PATH))", "")
