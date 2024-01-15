@@ -55,6 +55,9 @@ void	ft_bzero(void *s, size_t n);
 char	**ft_strsplit(const char *s, char c, int *len);
 char	*ft_strsub(char const *s, unsigned int start, size_t len);
 void	*ft_malloc(size_t size);
+char    *ft_trim(char *s);
+char	*ft_strchr(const char *s, int c);
+int     ft_strlen(const char *str);
 
 // ****************** PARSING SECTIONS ****************** //
 
