@@ -3,11 +3,45 @@
 
 //https://www.devdungeon.com/content/using-libpcap-c#intro
 
+// printf
 #include <stdio.h>
+
+// bzero
+#include <strings.h>
+
+
 #include <time.h>
 #include <pcap.h>
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
+
+typedef int bool ;  //définition du type booléen,
+
+#define false  0 /* affectation des valeurs conventionnelles*/
+
+#define true  1
+
+#define USAGE      "> ft_nmap [--help] [--ports[NUMBER/RANGED]] --ip   IP_ADDRESS [--speedup[NUMBER]] [--scan [TYPE]]"
+#define USAGE_FILE "          [--help] [--ports[NUMBER/RANGED]] --file FILE       [--speedup[NUMBER]] [--scan [TYPE]]"
+
+
+#define SCAN_SYN 0x01
+#define SCAN_NULL 0x02
+#define SCAN_ACK 0x04
+#define SCAN_FIN 0x08
+#define SCAN_XMAS 0x10
+#define SCAN_UDP 0x20
+
+typedef struct s_data {
+    struct {
+        short start; // the started port that need to be scan (include)
+        short end; // the started port that need to be scan (include)
+    } ports_range; // ports need to be scan store as a range
+    short *ports; // ports need to be scan store as a list
+    char **ip_address; // the list of ip address that need to be scan
+    short speedup; // default 0, max 250
+    char scanmask; // SYN, NULL, ACK, FIN, XMAS, UDP
+} t_data;
 
 
 #endif
