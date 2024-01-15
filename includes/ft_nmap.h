@@ -41,6 +41,15 @@ typedef int bool ;  //définition du type booléen,
 #define SCAN_XMAS 0x10
 #define SCAN_UDP 0x20
 
+typedef struct s_scan {
+    char syn:1;
+    char null:1;
+    char ack:1;
+    char fin:1;
+    char xmas:1;
+    char udp:1;
+} t_scan;
+
 typedef struct s_data {
     struct {
         short start; // the started port that need to be scan (include)
@@ -49,7 +58,7 @@ typedef struct s_data {
     short *ports; // ports need to be scan store as a list
     char **ip_address; // the list of ip address that need to be scan
     short speedup; // default 0, max 250
-    char scanmask; // SYN, NULL, ACK, FIN, XMAS, UDP
+    t_scan scanmask; // SYN, NULL, ACK, FIN, XMAS, UDP
 } t_data;
 
 

@@ -4,11 +4,11 @@ void usage() {
     dprintf(1, "%s\n%s\n", USAGE, USAGE_FILE);
 }
 
-#define help 6385292014
-#define ports 210724489981
-#define ip 5863486
-#define speedup 229482867160219
-#define scan 6385684778
+#define HELP 6385292014
+#define PORTS 210724489981
+#define IP 5863486
+#define SPEEDUP 229482867160219
+#define SCAN 6385684778
 
 const unsigned long hash(const char *str) {
     unsigned long hash = 5381;  
@@ -91,6 +91,29 @@ char **parse_file(char *file_name) {
     return ips;
 }
 
+char **parse_ip_line(char *line) {
+    char    **ips;
+    int     nb_ips, nb_arg;
+    
+    if (!(ips = ft_strsplit(line, ',', &nb_arg)))
+        return 0;
+    nb_ips = 0;
+    for (int n = 0; n < nb_arg; n++) {
+        if (is_valid_addr(ft_strcpy(ips[n], ft_trim(ips[n]))))
+            ips[nb_ips++] = ips[n];
+        else
+            free(ips[n]);
+    }
+    ips[nb_ips] = 0;
+    return ips;
+}
+
+t_scan parse_scan(char *line) {
+    t_scan scan;
+    
+    return scan;
+}
+
 void manage_argument(char *option, char *value, t_data *data) {
     switch (hash(option)) {
     case 6385292014: // help
@@ -102,6 +125,7 @@ void manage_argument(char *option, char *value, t_data *data) {
         break;
     case 5863486: // ip
         dprintf(1, "IP\n");
+        data->ip_address = parse_ip_line(value);
         break;
     case 229482867160219: // speedup
         dprintf(1, "SPEEDUP\n");
