@@ -1,6 +1,6 @@
 #include "ft_nmap.h"
 
-char *trim(char *s) {
+char *ft_trim(char *s) {
     char *ptr;
     if (!s) return NULL;
     if (!*s) return s;
