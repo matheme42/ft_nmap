@@ -22,7 +22,8 @@ INC= $(INC_PATH)/*
 
 NAME_SRC= parsing.c parsing_submodule.c
 
-NAME_SRC_UTILS = atoi.c bzero.c ft_split.c ft_strsub.c ft_malloc.c ft_strchr.c ft_strlen.c trim.c
+NAME_SRC_UTILS = atoi.c bzero.c ft_split.c ft_strsub.c \
+				ft_malloc.c ft_strchr.c ft_strlen.c trim.c ft_strcpy.c \
 
 NAME_SRC_LEN	= $(shell echo -n $(NAME_SRC) | wc -w)
 I				= 

@@ -58,14 +58,16 @@ void	*ft_malloc(size_t size);
 char    *ft_trim(char *s);
 char	*ft_strchr(const char *s, int c);
 int     ft_strlen(const char *str);
+char	*ft_strcpy(char *dest, const char *str);
 
 // ****************** PARSING SECTIONS ****************** //
 
 #define MIN_SPEEDUP 1
 #define MAX_SPEEDUP 250
-
-
 void set_speedup_value(char *value, t_data *data);
+
+#define MIN_PORT 1
+#define MAX_PORT 1024
 void set_ports_value(char *str, t_data *data);
 
 #endif
