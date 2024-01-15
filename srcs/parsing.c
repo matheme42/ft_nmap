@@ -29,7 +29,7 @@ void free_ips(char **ips) {
         dprintf(0, "%s\n", ips[n]);
         free(ips[n++]);
     }
-    free(ips[n]);
+    free(ips);
 }
 
 static int fill_file_data(char *file_name, void *buf, int size) {
@@ -82,7 +82,7 @@ char **parse_file(char *file_name) {
         return 0;
     nb_ips = 0;
     for (int n = 0; n < nb_lines; n++) {
-        if (is_valid_addr(ft_trim(ips[n])))
+        if (is_valid_addr(ft_strcpy(ips[n], ft_trim(ips[n]))))
             ips[nb_ips++] = ips[n];
         else
             free(ips[n]);
