@@ -4,12 +4,6 @@ void usage() {
     dprintf(1, "%s\n%s\n", USAGE, USAGE_FILE);
 }
 
-#define HELP 6385292014
-#define PORTS 210724489981
-#define IP 5863486
-#define SPEEDUP 229482867160219
-#define SCAN 6385684778
-
 const unsigned long hash(const char *str) {
     unsigned long hash = 5381;  
     int c;
@@ -17,19 +11,6 @@ const unsigned long hash(const char *str) {
     while ((c = *str++))
         hash = ((hash << 5) + hash) + c;
     return hash;
-}
-
-void free_ips(char **ips) {
-    int n;
-
-    if (!ips)
-        return ;
-    n = 0;
-    while (ips[n]) {
-        dprintf(0, "%s\n", ips[n]);
-        free(ips[n++]);
-    }
-    free(ips);
 }
 
 static int fill_file_data(char *file_name, void *buf, int size) {
@@ -163,8 +144,13 @@ int main(int ac, char **av) {
     t_data data;
 
     bzero(&data, sizeof(data));
-    if (!parse_arguments(ac, av, &data)) usage();
+    if (!parse_arguments(ac, av, &data)) {
+        for (int i = 0; i < data.ports_number; i++) {
+        dprintf(1, "%d\n", data.ports[i]);
+        }
+        usage();
+    }
 
-    free_ips(data.ip_address);
+    free_tab(data.ip_address);
     return (0);
 }
