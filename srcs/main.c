@@ -51,6 +51,8 @@ void set_filter(pcap_t *p) {
         fprintf(stderr, "Could not set filter : %s\n", pcap_geterr(p));
         return ;
     }
+    free(program.bf_insns);
+    //pcap_freecode(&program);
 }
 
 int main(int argc, char *argv[]) {
