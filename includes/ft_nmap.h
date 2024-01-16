@@ -56,11 +56,8 @@ typedef struct s_scan {
 } t_scan;
 
 typedef struct s_data {
-    struct {
-        short start; // the started port that need to be scan (include)
-        short end; // the started port that need to be scan (include)
-    } ports_range; // ports need to be scan store as a range
-    short *ports; // ports need to be scan store as a list
+    short ports[1024]; // ports need to be scan store as a list
+    short ports_number;
     char **ip_address; // the list of ip address that need to be scan
     short speedup; // default 0, max 250
     t_scan scanmask; // SYN, NULL, ACK, FIN, XMAS, UDP
@@ -78,6 +75,7 @@ char    *ft_trim(char *s);
 char	*ft_strchr(const char *s, int c);
 int     ft_strlen(const char *str);
 char	*ft_strcpy(char *dest, const char *str);
+void    free_tab(char **x);
 
 // ****************** PARSING SECTIONS ****************** //
 
