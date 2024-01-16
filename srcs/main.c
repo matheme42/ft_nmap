@@ -24,9 +24,11 @@ void my_packet_handler(
 
 void print_devs(pcap_if_t *alldevsp) {
     char errbuf[PCAP_ERRBUF_SIZE];
+    char ipbuff[INET_ADDRSTRLEN + 1];
     bpf_u_int32 netp, maskp;
     pcap_if_t *dev;
 
+    ipbuff[INET_ADDRSTRLEN] = 0;
     dev = alldevsp;
     printf("devs:\n");
     while (dev) {
@@ -36,8 +38,10 @@ void print_devs(pcap_if_t *alldevsp) {
             continue;
         }
         printf("name %s\n", dev->name);
-        printf("ip %d\n", netp);
-        printf("mask %d\n\n", maskp);
+        inet_ntop(AF_INET, &netp, ipbuff, INET_ADDRSTRLEN);
+        printf("ip %s\n", ipbuff);
+        inet_ntop(AF_INET, &maskp, ipbuff, INET_ADDRSTRLEN);
+        printf("mask %s\n\n", ipbuff);
         dev = dev->next;
     }
 }
@@ -193,7 +197,7 @@ int main(int argc, char **argv) {
     send_tcp_packet();
 
    // free_data(&data);
-    return 0;
+   return 0;
 
     char *device;
     char error_buffer[PCAP_ERRBUF_SIZE];
@@ -215,6 +219,7 @@ int main(int argc, char **argv) {
             timeout_limit,
             error_buffer
         );
+        print_devs(alldevsp);
     if (handle == NULL) {
          fprintf(stderr, "Could not open device %s: %s\n", device, error_buffer);
          return 2;
