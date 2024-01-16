@@ -39,9 +39,22 @@ typedef int bool ;  //définition du type booléen,
 #define USAGE      "> ft_nmap [--help] [--ports[NUMBER/RANGED]] --ip   IP_ADDRESS [--speedup[NUMBER]] [--scan [TYPE]]"
 #define USAGE_FILE "          [--help] [--ports[NUMBER/RANGED]] --file FILE       [--speedup[NUMBER]] [--scan [TYPE]]"
 
+struct shtcp {
+    unsigned int src;
+    unsigned int dst;
+    char reserved;
+    char protocol;
+    short tcp_len;
+};
 
 struct packet {
-	struct iphdr	iphdr;
+    union {
+        struct iphdr	iphdr;
+        struct {
+            char            padding[8];
+            struct shtcp    hdr;
+        } shtcp;
+    };    
 	union {
 		struct udphdr udphdr;
         struct tcphdr tcphdr;
