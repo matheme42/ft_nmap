@@ -42,12 +42,17 @@ typedef int bool ;  //définition du type booléen,
 #define SCAN_UDP 0x20
 
 typedef struct s_scan {
-    char syn:1;
-    char null:1;
-    char ack:1;
-    char fin:1;
-    char xmas:1;
-    char udp:1;
+    union {
+        struct {
+            char syn:1;
+            char null:1;
+            char ack:1;
+            char fin:1;
+            char xmas:1;
+            char udp:1;
+        } type;
+        char mask;
+    };
 } t_scan;
 
 typedef struct s_data {

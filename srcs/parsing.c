@@ -108,9 +108,48 @@ char **parse_ip_line(char *line) {
     return ips;
 }
 
-t_scan parse_scan(char *line) {
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	int n;
+
+	n = 0;
+	while (s1[n] == s2[n] && (s1[n] != '\0' || s2[n] != '\0'))
+		n++;
+	return ((unsigned char)s1[n] - (unsigned char)s2[n]);
+}
+
+t_scan strtoscan(char *str) {
     t_scan scan;
-    
+
+    scan.mask = 0;
+    if (!ft_strcmp(str, "ACK"))
+        scan.type.ack = 1;
+    else if (!ft_strcmp(str, "FIN"))
+        scan.type.fin = 1;
+    else if (!ft_strcmp(str, "NULL"))
+        scan.type.null = 1;
+    else if (!ft_strcmp(str, "SYN"))
+        scan.type.syn = 1;
+    else if (!ft_strcmp(str, "UDP"))
+        scan.type.udp = 1;
+    else if (!ft_strcmp(str, "XMAS"))
+        scan.type.xmas = 1;
+    return scan;
+}
+
+t_scan parse_scan(char *line) {
+    t_scan  scan;
+    char    *ptr;
+
+    scan.mask = 0;
+    if (!line)
+        return scan;
+    while((ptr = ft_strchr(line, ','))) {
+        ptr[0] = 0;
+        scan.mask |= strtoscan(line).mask;
+        line = ptr + 1;
+    }
+    scan.mask |= strtoscan(line).mask;
     return scan;
 }
 
@@ -133,6 +172,7 @@ void manage_argument(char *option, char *value, t_data *data) {
         break;     
     case 6385684778: // scan
         dprintf(1, "SCAN\n");
+        data->scanmask = parse_scan(value);
         break;        
     case 6385224485: // file
         dprintf(1, "FILE\n");
