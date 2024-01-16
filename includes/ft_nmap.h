@@ -23,6 +23,12 @@
 #include <pcap.h>
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
+#include <netinet/ip.h>
+#include <netinet/udp.h>
+#ifndef __USE_MISC
+#define __USE_MISC
+#endif
+#include <netinet/tcp.h>
 
 typedef int bool ;  //définition du type booléen,
 
@@ -34,12 +40,13 @@ typedef int bool ;  //définition du type booléen,
 #define USAGE_FILE "          [--help] [--ports[NUMBER/RANGED]] --file FILE       [--speedup[NUMBER]] [--scan [TYPE]]"
 
 
-#define SCAN_SYN 0x01
-#define SCAN_NULL 0x02
-#define SCAN_ACK 0x04
-#define SCAN_FIN 0x08
-#define SCAN_XMAS 0x10
-#define SCAN_UDP 0x20
+struct packet {
+	struct iphdr	iphdr;
+	union {
+		struct udphdr udphdr;
+        struct tcphdr tcphdr;
+	};
+};
 
 typedef struct s_scan {
     union {

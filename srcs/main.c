@@ -56,6 +56,79 @@ void set_filter(pcap_t *p) {
     //pcap_freecode(&program);
 }
 
+int create_socket() {
+    int sockId;
+    int option;
+
+
+    if ((sockId = socket(PF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0) {
+        dprintf(2, "ft_traceroute: Socket creation failed\n");
+        return 0;
+    }
+
+    // set custom header to true
+    option = 1;
+    if (setsockopt(sockId, IPPROTO_IP, IP_HDRINCL, &option, sizeof(option))) {
+        dprintf(2, "ft_traceroute: Failed to set socket option\n");
+        return 0;
+    }
+    return (sockId);
+}
+
+void fill_UDP_Header(struct udphdr *udphdr, int port) {
+    udphdr->source = INADDR_ANY;
+    udphdr->dest = htons(port);
+    udphdr->len = htons(sizeof(struct packet) - sizeof(struct iphdr));
+    udphdr->check = 0;
+}
+
+void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags) {
+    ft_bzero(tcphdr, sizeof(struct tcphdr));
+    tcphdr->source = 0;
+    tcphdr->dest = 0;
+    tcphdr->seq = 0;
+    tcphdr->ack_seq = 0;
+    tcphdr->res1 = sizeof(struct tcphdr) / 4;
+    tcphdr->ack = flags.type.ack;
+    tcphdr->syn = flags.type.syn;
+    tcphdr->fin = flags.type.fin;
+    tcphdr->doff = 0;
+    tcphdr->check = 0;
+    tcphdr->window = sizeof(struct packet);
+    tcphdr->urg_ptr = 0;
+}
+
+void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t protocol) {
+    header->version = IPVERSION;
+    header->ihl = 5;
+    header->tos = 0;
+    header->tot_len = 0;
+    header->id = getuid();
+    header->frag_off = 0;
+    header->ttl = 255;
+    header->protocol = protocol;
+    header->check = 0;
+    header->saddr = INADDR_ANY;
+    header->daddr = daddr;
+}
+
+void send_tcp_packet() {
+    struct packet pkt;
+    struct sockaddr_in addr;
+    t_scan flag;
+    int sock = create_socket();
+
+    flag.mask = 0;
+    flag.type.syn = 1;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(80);
+    addr.sin_addr.s_addr = 0;
+    fill_IP_Header(&pkt.iphdr, 0, IPPROTO_TCP);
+    fill_TCP_Header(&pkt.tcphdr, flag);
+
+    sendto(sock, &pkt, sizeof(struct packet), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_in));
+}
+
 int main(int argc, char **argv) {
 
     t_data data;
@@ -64,6 +137,8 @@ int main(int argc, char **argv) {
 
     print_data(&data);
     // execute program
+    send_tcp_packet();
+
     free_data(&data);
 
 

@@ -62,7 +62,7 @@ bool parse_arguments(int ac, char **av, t_data *data) {
     bool skip;
     
     skip = false;
-    ft_bzero(data, sizeof(*data));
+    ft_bzero(data, sizeof(t_data));
     for (int idx = 1; idx < ac; idx++) {
         if (!skip && av[idx][0] == '-' && av[idx][1] == '-') {
             if (!manage_argument(&(av[idx][2]), av[idx + 1], data)) {
