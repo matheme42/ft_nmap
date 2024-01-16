@@ -3,6 +3,7 @@
 #include <pcap.h>
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
+#include "ft_nmap.h"
 
 void my_packet_handler(
     u_char *args,
@@ -55,7 +56,17 @@ void set_filter(pcap_t *p) {
     //pcap_freecode(&program);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char **argv) {
+
+    t_data data;
+
+    if (!parse_arguments(argc, argv, &data)) return (1);
+
+    print_data(&data);
+    // execute program
+    free_data(&data);
+
+
     char *device;
     char error_buffer[PCAP_ERRBUF_SIZE];
     pcap_t *handle;

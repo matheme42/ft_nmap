@@ -75,18 +75,41 @@ char    *ft_trim(char *s);
 char	*ft_strchr(const char *s, int c);
 int     ft_strlen(const char *str);
 char	*ft_strcpy(char *dest, const char *str);
+int     ft_strcmp(const char *s1, const char *s2);
 void    free_tab(char **x);
 
 // ****************** PARSING SECTIONS ****************** //
 
+// option --speedup
 #define MIN_SPEEDUP 1
 #define MAX_SPEEDUP 250
 void set_speedup_value(char *value, t_data *data);
 
+// option --ports
 #define MIN_PORT 1
 #define MAX_PORT 1024
 void set_ports_value(char *str, t_data *data);
 
+// option --help
 void show_help();
 
+// option --file
+char **parse_file(char *file_name);
+
+// option --ip
+char **parse_ip_line(char *line);
+
+// option --scan
+t_scan parse_scan(char *line);
+
+// display parsed data struct
+void print_data(t_data *data);
+
+// display the usage
+void usage();
+
+// free parsed data
+void free_data(t_data *data);
+
+// ****************** OTHERS SECTIONS ****************** //
 #endif
