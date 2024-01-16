@@ -10,7 +10,7 @@ void set_speedup_value(char *str, t_data *data) {
 }
 
 
-void set_ports_value_from_range(char *str, t_data *data) {
+static void set_ports_value_from_range(char *str, t_data *data) {
     int     len;
     short   start_port;
     short   end_port;
@@ -47,12 +47,12 @@ void set_ports_value_from_range(char *str, t_data *data) {
         return ;
     }
     data->ports_number = (end_port - start_port) + 1;
-    for (size_t i = start_port; i <= end_port; i++)
+    for (size_t i = start_port; (short int)i <= end_port; i++)
         data->ports[i - start_port] = i;
 }
 
 
-void set_ports_value_from_list(char *str, t_data *data) {
+static void set_ports_value_from_list(char *str, t_data *data) {
     int     len;
     int     v;
     int     nb_valid_ports;
@@ -67,7 +67,7 @@ void set_ports_value_from_list(char *str, t_data *data) {
     for (int i = 0; i < len; i++) {
         v = ft_atoi(split_data[i]);
         if (v < MIN_PORT || v > MAX_PORT) {
-            fprintf(stderr, "Invalide range for option ports: %d (MIN: %d MAX: %d)\n", split_data[i], MIN_PORT, MAX_PORT);
+            fprintf(stderr, "Invalide range for option ports: %s (MIN: %d MAX: %d)\n", split_data[i], MIN_PORT, MAX_PORT);
             continue;
         }
         data->ports[nb_valid_ports++] = v;
@@ -103,4 +103,14 @@ void set_ports_value(char *str, t_data *data)
         return ;
     }
     set_ports_value_from_list(str, data);
+}
+
+void show_help() {
+    fprintf(stderr, "> ft_nmap [OPTIONS]\n");
+    fprintf(stderr, "--help     Print this help screen\n");
+    fprintf(stderr, "--ports    ports to scan (eg: 1-10 or 1,2,3)\n");
+    fprintf(stderr, "--ip       ip addresses to scan in dot format\n");
+    fprintf(stderr, "--file     File name containing IP addresses to scan\n");
+    fprintf(stderr, "--speedup  [250 max] number of parallel threads to use\n");
+    fprintf(stderr, "--scan     SYN / NULL / FIN / XMAS / ACK / UDP\n");
 }

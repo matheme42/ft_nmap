@@ -87,4 +87,6 @@ void set_speedup_value(char *value, t_data *data);
 #define MAX_PORT 1024
 void set_ports_value(char *str, t_data *data);
 
+void show_help();
+
 #endif

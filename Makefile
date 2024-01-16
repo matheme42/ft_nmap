@@ -25,7 +25,7 @@ NAME_SRC= parsing.c parsing_submodule.c
 NAME_SRC_UTILS = atoi.c bzero.c ft_split.c ft_strsub.c free_tab.c \
 				ft_malloc.c ft_strchr.c ft_strlen.c trim.c ft_strcpy.c \
 
-NAME_SRC_LEN	= $(shell echo -n $(NAME_SRC) | wc -w)
+NAME_SRC_LEN	= $(shell echo -n $(NAME_SRC) $(NAME_SRC_UTILS) | wc -w)
 I				= 
 
 OBJ_NAME		= $(NAME_SRC:.c=.o)
@@ -34,20 +34,20 @@ OBJ_NAME_UTILS	= $(NAME_SRC_UTILS:.c=.o)
 
 OBJS = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME)) $(addprefix $(OBJ_PATH)/utils/,$(OBJ_NAME_UTILS))
 
-DEBUG_FLAG = -Wall -Wextra -Werror #-fsanitize=address
+DEBUG_FLAG = -Wall -Wextra -fsanitize=address
 
 
 
 all: $(NAME)
 
 $(NAME) : $(OBJS)
-	@$(CC) $^ -o $@ -lpcap
+	@$(CC) $(DEBUG_FLAG) $^ -o $@ -lpcap
 	@echo "	\033[2K\r$(DARK_BLUE)$(NAME):\t\t$(GREEN)loaded\033[0m"
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c $(INC) Makefile
 	@mkdir $(OBJ_PATH) 2> /dev/null || true
 	@mkdir $(OBJ_PATH)/utils 2> /dev/null || true
-	@$(CC) -I $(INC_PATH) -c $< -o $@
+	@$(CC) $(DEBUG_FLAG) -I $(INC_PATH) -c $< -o $@
 	@$(eval I=$(shell echo $$(($(I)+1))))
 	@printf "\033[2K\r${G}$(DARK_BLUE)>>\t\t\t\t$(I)/$(shell echo $(NAME_SRC_LEN)) ${N}$(BLUE)$<\033[36m \033[0m"
 
