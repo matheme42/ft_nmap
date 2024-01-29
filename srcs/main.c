@@ -16,6 +16,29 @@ void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header,
   return;
 }
 
+char *get_devname_by_ip(pcap_if_t *alldevsp, char *ip) {
+  char errbuf[PCAP_ERRBUF_SIZE];
+  bpf_u_int32 netp, maskp;
+  pcap_if_t *dev;
+  int srcIp = 0;
+  int srcIpMask = 0;
+  int devIpMask = 0;
+
+  dev = alldevsp;
+
+  inet_pton(AF_INET, ip, &srcIp);
+  while (dev) {
+    if (pcap_lookupnet(dev->name, &netp, &maskp, errbuf)) {
+      dev = dev->next;
+      continue;
+    }
+    srcIpMask = (srcIp & maskp);
+    devIpMask = (netp & maskp);
+    if (srcIpMask == devIpMask && devIpMask != 0) return (dev->name);
+    dev = dev->next;
+  }
+}
+
 void print_devs(pcap_if_t *alldevsp) {
   char errbuf[PCAP_ERRBUF_SIZE];
   char ipbuff[INET_ADDRSTRLEN + 1];
@@ -115,9 +138,21 @@ int main(int argc, char **argv) {
   //  execute program
   send_tcp_packet();
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< HEAD
   get_public_ip();
+=======
+  dprintf(1, "%s\n", get_public_ip());
+>>>>>>> 022e8bea399bd5fdef0927378aa1ca0959d0da29
+=======
+  //get_public_ip();
+>>>>>>> Stashed changes
+=======
+  //get_public_ip();
+>>>>>>> Stashed changes
   // free_data(&data);
-  return 0;
+
 
   char *device;
   char error_buffer[PCAP_ERRBUF_SIZE];
@@ -129,8 +164,11 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Error finding devs: %s\n", error_buffer);
     return 1;
   }
-  print_devs(alldevsp);
+//  print_devs(alldevsp);
+  dprintf(1, "%s\n", get_devname_by_ip(alldevsp, "172.24.53.16"));
 
+
+  return (0);
   /* Open device for live capture */
   handle =
       pcap_open_live(alldevsp->name, BUFSIZ, 0, timeout_limit, error_buffer);

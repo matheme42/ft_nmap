@@ -15,6 +15,10 @@ int create_socket(int protoType) {
     dprintf(2, "ft_nmap: Failed to set socket option\n");
     return 0;
   }
+<<<<<<< HEAD
   dprintf(1, "gimme socketFd \n");
+=======
+  dprintf(1, "gimme socketFd %d\n", sockId);
+>>>>>>> 022e8bea399bd5fdef0927378aa1ca0959d0da29
   return (sockId);
 }
