@@ -97,7 +97,7 @@ void set_filter(pcap_t *p) {
 //   return (sockId);
 // }
 
-void send_tcp_packet() {
+void send_tcp_packet(char *ipsrc) {
   struct packet pkt;
   struct sockaddr *addr;
   t_scan flag;
@@ -112,7 +112,7 @@ void send_tcp_packet() {
   ((struct sockaddr_in *)addr)->sin_port = htons(443);
 
   int src;
-  inet_pton(AF_INET, "172.24.53.16", &src);
+  inet_pton(AF_INET, ipsrc, &src);
 
   fill_SHTCP_Header(&pkt.shtcp.hdr,
                     (uint32_t)((struct sockaddr_in *)addr)->sin_addr.s_addr,
@@ -123,7 +123,6 @@ void send_tcp_packet() {
   fill_IP_Header(&pkt.iphdr,
                  (uint32_t)((struct sockaddr_in *)addr)->sin_addr.s_addr,
                  IPPROTO_TCP);
-
   sendto(sock, &pkt, sizeof(struct packet), 0, ((struct sockaddr *)addr),
          sizeof(struct sockaddr_in));
 }
@@ -136,22 +135,9 @@ int main(int argc, char **argv) {
 
   // print_data(&data);
   //  execute program
-  send_tcp_packet();
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-  get_public_ip();
-=======
+
   dprintf(1, "%s\n", get_public_ip());
->>>>>>> 022e8bea399bd5fdef0927378aa1ca0959d0da29
-=======
-  //get_public_ip();
->>>>>>> Stashed changes
-=======
-  //get_public_ip();
->>>>>>> Stashed changes
-  // free_data(&data);
 
 
   char *device;
@@ -165,23 +151,25 @@ int main(int argc, char **argv) {
     return 1;
   }
 //  print_devs(alldevsp);
-  dprintf(1, "%s\n", get_devname_by_ip(alldevsp, "172.24.53.16"));
-
-
-  return (0);
+  char *str = get_public_ip();
+  char *dev = get_devname_by_ip(alldevsp, str);
   /* Open device for live capture */
   handle =
-      pcap_open_live(alldevsp->name, BUFSIZ, 0, timeout_limit, error_buffer);
-  print_devs(alldevsp);
+      pcap_open_live(dev, BUFSIZ, 0, timeout_limit, error_buffer);
+
+ // print_devs(alldevsp);
   if (handle == NULL) {
     fprintf(stderr, "Could not open device %s: %s\n", device, error_buffer);
     return 2;
   }
 
   pcap_freealldevs(alldevsp);
-
   set_filter(handle);
+  return 0;
+  send_tcp_packet(str);
+  free(str);
 
+  return 0;
   pcap_dispatch(handle, 0, my_packet_handler, NULL);
 
   pcap_close(handle);
