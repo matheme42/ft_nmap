@@ -1,10 +1,12 @@
-#include "ft_nmap.h"
+#include "../../includes/ft_nmap.h"
 
 void free_tab(char **x) {
-    int n;
+  int n;
 
-    if (!x) return ;
-    n = 0;
-    while (x[n]) free(x[n++]);
-    free(x);
+  if (!x)
+    return;
+  n = 0;
+  while (x[n])
+    free(x[n++]);
+  free(x);
 }

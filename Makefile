@@ -14,6 +14,8 @@ NAME = ft_nmap
 
 # paths
 SRC_PATH= srcs
+PARSING_PATH= srcs/parsing/
+UTILS_PATH= srcs/utils/
 OBJ_PATH= .objs
 INC_PATH= includes
 
@@ -23,12 +25,9 @@ INC= $(INC_PATH)/*
 
 NAME_SRC= main.c
 
-NAME_SRC_PARSING= parsing.c parsing_set.c parsing_debug.c parsing_file.c \
-			parsing_scan.c parsing_usage.c
+NAME_SRC_PARSING= $(shell cd $(PARSING_PATH); ls *.c)
+NAME_SRC_UTILS= $(shell cd $(UTILS_PATH); ls *.c)
 
-NAME_SRC_UTILS = atoi.c bzero.c ft_split.c ft_strsub.c free_tab.c \
-				ft_malloc.c ft_strchr.c ft_strlen.c trim.c ft_strcpy.c \
-				ft_strcmp.c
 
 NAME_SRC_LEN	= $(shell echo -n $(NAME_SRC) $(NAME_SRC_UTILS) $(NAME_SRC_PARSING) | wc -w)
 I				= 
@@ -40,7 +39,7 @@ OBJ_NAME_PARSING= $(NAME_SRC_PARSING:.c=.o)
 
 OBJS = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME)) $(addprefix $(OBJ_PATH)/utils/,$(OBJ_NAME_UTILS)) $(addprefix $(OBJ_PATH)/parsing/,$(OBJ_NAME_PARSING))
 
-DEBUG_FLAG = -Wall -Wextra # -fsanitize=address
+DEBUG_FLAG = -o3 #-Wall -Wextra -fsanitize=address
 
 
 
@@ -49,6 +48,7 @@ all: $(NAME)
 $(NAME) : $(OBJS)
 	@$(CC) $(DEBUG_FLAG) $^ -o $@ -lpcap
 	@echo "	\033[2K\r$(DARK_BLUE)$(NAME):\t\t$(GREEN)loaded\033[0m"
+
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c $(INC) Makefile
 	@mkdir $(OBJ_PATH) 2> /dev/null || true
@@ -68,6 +68,9 @@ else
 	@printf "\033[2K\r$(DARK_BLUE)$(NAME) objects:\t$(LIGHT_PINK)removing\033[36m \033[0m\n"
 endif
 
+debug:
+	@echo "path utils = $(NAME_SRC_UTILS)"
+	@echo "path parsing = $(NAME_SRC_PARSING)"
 
 fclean: clean
 ifeq ("$(wildcard $(NAME))", "")
