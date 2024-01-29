@@ -100,9 +100,9 @@ static unsigned short checksum(void *b, int len)
     return result;
 }
 
-void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags) {
+void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, int port) {
     ft_bzero(tcphdr, sizeof(struct tcphdr));
-    tcphdr->source = htons(48927);
+    tcphdr->source = htons(port);
     tcphdr->dest = htons(443);
     tcphdr->seq = 0;
     tcphdr->ack_seq = 0;
@@ -167,18 +167,20 @@ void send_tcp_packet() {
     int sock = create_socket();
 
     flag.mask = 0;
-    flag.type.ack = 0;
+    flag.type.syn = 1;
     ((struct sockaddr_in *)addr)->sin_family = AF_INET;
     ((struct sockaddr_in *)addr)->sin_port = htons(443);
 
+
+
+    int send_port = 1000;
+
     int src;
     inet_pton(AF_INET, "172.24.53.16", &src);
-
     fill_SHTCP_Header(&pkt.shtcp.hdr, (uint32_t)((struct sockaddr_in *)addr)->sin_addr.s_addr, src);
-    fill_TCP_Header(&pkt.tcphdr, flag);
+    fill_TCP_Header(&pkt.tcphdr, flag, send_port);
     pkt.tcphdr.check = checksum(&pkt.shtcp.hdr, sizeof(struct shtcp) + sizeof(struct tcphdr));
     fill_IP_Header(&pkt.iphdr, (uint32_t)((struct sockaddr_in *)addr)->sin_addr.s_addr, IPPROTO_TCP);
-
     sendto(sock, &pkt, sizeof(struct packet), 0, ((struct sockaddr *)addr), sizeof(struct sockaddr_in));
 }
 

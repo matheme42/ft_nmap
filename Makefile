@@ -21,7 +21,7 @@ INC_PATH= includes
 INC= $(INC_PATH)/*
 
 
-NAME_SRC= main.c
+NAME_SRC= main.c get_available_port.c
 
 NAME_SRC_PARSING= parsing.c parsing_set.c parsing_debug.c parsing_file.c \
 			parsing_scan.c parsing_usage.c

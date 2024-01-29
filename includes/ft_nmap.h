@@ -132,4 +132,7 @@ void usage();
 void free_data(t_data *data);
 
 // ****************** OTHERS SECTIONS ****************** //
+
+int getAvailablePort(int socket, char *src);
+
 #endif
