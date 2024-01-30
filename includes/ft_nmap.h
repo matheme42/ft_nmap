@@ -87,6 +87,8 @@ typedef struct s_data {
 
 // ******************* UTILS SECTIONS ******************* //
 
+char *ft_itoa(int n);
+char *ft_strjoin(char const *s1, char const *s2);
 int ft_atoi(const char *str);
 void ft_bzero(void *s, size_t n);
 char **ft_strsplit(const char *s, char c, int *len);
@@ -113,6 +115,15 @@ void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t protocol);
 
 void lookup_host(const char *host, struct sockaddr **sockaddr);
 unsigned short checksum(void *b, int len);
+
+/* PCAP RULES */
+
+void set_filter(pcap_t *p);
+void compile_host_rule(pcap_t *p, char *host,
+                       struct bpf_program *filter_program, char *host_family);
+void compile_portrange_rule(pcap_t *p, int port_min, int port_max,
+                            struct bpf_program *filter_program,
+                            char *port_family);
 
 // ****************** PARSING SECTIONS ****************** //
 
