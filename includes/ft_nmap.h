@@ -80,8 +80,11 @@ typedef struct s_scan {
 typedef enum {UDP, FIN, SYN, XMAS, NUL, ACK} E_SCAN;
 
 typedef struct {
-  char *pubip;
-  char *device;
+  u_int32_t pubip;
+  u_int32_t destip;
+  u_int16_t ports[1024];
+  int       nb_port;
+  char      *device;
 } thread_data;
 
 typedef struct s_data {
@@ -109,7 +112,7 @@ char *ft_strcpy(char *dest, const char *str);
 int ft_strcmp(const char *s1, const char *s2);
 void free_tab(char **x);
 
-char *get_public_ip();
+u_int32_t get_public_ip(const char *host);
 
 /* SOCKET */
 int create_socket(int protoType);

@@ -8,7 +8,7 @@
 #include <pthread.h>
 
 void print_packet_info(const u_char *packet, struct pcap_pkthdr packet_header) {
-  dprintf(1, "we got %lu bytes\n", packet_header.len);
+  dprintf(1, "we got %u bytes\n", packet_header.len);
   for (int i = 0; i < packet_header.len; i++) {
     if (i % 8 == 0 && i != 0) dprintf(1, "\n");
     dprintf(1, "%02hhx ", packet[i]);
@@ -22,23 +22,20 @@ void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header,
   return;
 }
 
-char *get_devname_by_ip(pcap_if_t *alldevsp, char *ip) {
+char *get_devname_by_ip(pcap_if_t *alldevsp, u_int32_t ip) {
   char errbuf[PCAP_ERRBUF_SIZE];
   bpf_u_int32 netp, maskp;
   pcap_if_t *dev;
-  int srcIp = 0;
   int srcIpMask = 0;
   int devIpMask = 0;
 
   dev = alldevsp;
-
-  inet_pton(AF_INET, ip, &srcIp);
   while (dev) {
     if (pcap_lookupnet(dev->name, &netp, &maskp, errbuf)) {
       dev = dev->next;
       continue;
     }
-    srcIpMask = (srcIp & maskp);
+    srcIpMask = (ip & maskp);
     devIpMask = (netp & maskp);
     if (srcIpMask == devIpMask && devIpMask != 0)
       return (dev->name);
@@ -116,13 +113,11 @@ void *thread_routine(void *ptr) {
   struct sockaddr dest_addr;
   t_packet packet;
 
-  struct sockaddr *destpoiteur;
-  lookup_host("google.com", &destpoiteur);
-  u_int32_t src_host;
-  inet_pton(AF_INET, data->pubip, &src_host);
-  ((struct sockaddr_in *)&src_addr)->sin_port = 34443;
-  ((struct sockaddr_in *)&src_addr)->sin_addr.s_addr = src_host;
-  ((struct sockaddr_in *)&src_addr)->sin_port = 1000;
+  ((struct sockaddr_in *)&src_addr)->sin_addr.s_addr = data->pubip;
+  ((struct sockaddr_in *)&src_addr)->sin_port = 34443;  
+
+  ((struct sockaddr_in *)&dest_addr)->sin_addr.s_addr = data->destip;
+  ((struct sockaddr_in *)&dest_addr)->sin_port = 1000;
 
   int sock = create_socket(IPPROTO_TCP);
   create_scan_packet(UDP, &src_addr, &dest_addr, &packet);
@@ -135,7 +130,7 @@ void *thread_routine(void *ptr) {
   return NULL;
 }
 
-void dispatch_thread(int threads, char *device, char *pubip) {
+void dispatch_thread(int threads, char *device, u_int32_t pubip) {
   pthread_t thread[MAX_SPEEDUP];
   thread_data data[MAX_SPEEDUP];
 
@@ -166,7 +161,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  char *pubip = get_public_ip();
+  u_int32_t pubip = get_public_ip("google.com");
   char *dev = get_devname_by_ip(alldevsp, pubip);
   if (!dev)
     return 2;
@@ -176,6 +171,5 @@ int main(int argc, char **argv) {
   //set_filter(handle);
  // send_tcp_packet(str);
   pcap_freealldevs(alldevsp);
-  free(pubip);
   return 0;
 }
