@@ -60,3 +60,18 @@ void create_scan_packet(E_SCAN scan, struct sockaddr *src, struct sockaddr *dst,
     }
     create_tcp_packet(scan, src, dst, pkt);
 }
+
+void send_packet(thread_data *data, int socket) {
+    struct sockaddr src_addr;
+    struct sockaddr dest_addr;
+    t_packet packet;
+
+    ((struct sockaddr_in *)&src_addr)->sin_addr.s_addr = data->pubip;
+    ((struct sockaddr_in *)&src_addr)->sin_port = 34443;  
+
+    ((struct sockaddr_in *)&dest_addr)->sin_addr.s_addr = data->destip;
+    ((struct sockaddr_in *)&dest_addr)->sin_port = 1000;
+
+    create_scan_packet(UDP, &src_addr, &dest_addr, &packet);
+    sendto(socket, &packet, sizeof(struct packet), 0, ((struct sockaddr *)&dest_addr), sizeof(struct sockaddr_in));
+}

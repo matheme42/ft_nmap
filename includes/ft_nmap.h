@@ -170,5 +170,6 @@ void free_data(t_data *data);
 
 // ****************** OTHERS SECTIONS ****************** //
 
-void create_scan_packet(E_SCAN scan, struct sockaddr *src, struct sockaddr *dst, t_packet *pkt);
+void send_packet(thread_data *data, int socket);
+void dispatch_thread(int threads, char *device, u_int32_t pubip);
 #endif
