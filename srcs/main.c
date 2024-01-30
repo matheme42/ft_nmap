@@ -2,6 +2,7 @@
 #include <netinet/if_ether.h>
 #include <netinet/in.h>
 #include <pcap.h>
+#include <pcap/pcap.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -62,22 +63,6 @@ void print_devs(pcap_if_t *alldevsp) {
     printf("mask %s\n\n", ipbuff);
     dev = dev->next;
   }
-}
-
-void set_filter(pcap_t *p) {
-  struct bpf_program program;
-  const char *str = "greater 200";
-
-  if (pcap_compile(p, &program, str, 1, PCAP_NETMASK_UNKNOWN)) {
-    fprintf(stderr, "Could not compile program : %s\n", pcap_geterr(p));
-    return;
-  }
-  if (pcap_setfilter(p, &program)) {
-    fprintf(stderr, "Could not set filter : %s\n", pcap_geterr(p));
-    return;
-  }
-  free(program.bf_insns);
-  // pcap_freecode(&program);
 }
 
 // int create_socket() {
