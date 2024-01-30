@@ -1,8 +1,8 @@
 #include "../../includes/ft_nmap.h"
 
-void fill_UDP_Header(struct udphdr *udphdr, int port) {
-  udphdr->source = INADDR_ANY;
-  udphdr->dest = htons(port);
+void fill_UDP_Header(struct udphdr *udphdr, uint16_t sport, uint16_t dport) {
+  udphdr->source = htons(sport);
+  udphdr->dest = htons(dport);
   udphdr->len = htons(sizeof(struct packet) - sizeof(struct iphdr));
   udphdr->check = 0;
 }

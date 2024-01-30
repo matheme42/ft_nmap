@@ -1,7 +1,8 @@
 #include "ft_nmap.h"
 
-static void create_udp_packet() {
-
+static void create_udp_packet(t_packet *pkt, uint32_t daddr, uint16_t sport, uint16_t dport) {
+  fill_IP_Header(&pkt->iphdr, daddr, IPPROTO_UDP);
+  fill_UDP_Header(&pkt->udphdr, sport, dport);
 }
 
 static t_scan convert_scan_name_to_flag(char *scan_name) {
