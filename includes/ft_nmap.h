@@ -79,6 +79,11 @@ typedef struct s_scan {
 
 typedef enum {UDP, FIN, SYN, XMAS, NUL, ACK} E_SCAN;
 
+typedef struct {
+  char *pubip;
+  char *device;
+} thread_data;
+
 typedef struct s_data {
   short ports[1024]; // ports need to be scan store as a list
   short ports_number;

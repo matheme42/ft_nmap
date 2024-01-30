@@ -5,6 +5,7 @@
 #include <pcap/pcap.h>
 #include <stdio.h>
 #include <time.h>
+#include <pthread.h>
 
 void print_packet_info(const u_char *packet, struct pcap_pkthdr packet_header) {
   dprintf(1, "we got %lu bytes\n", packet_header.len);
@@ -43,6 +44,7 @@ char *get_devname_by_ip(pcap_if_t *alldevsp, char *ip) {
       return (dev->name);
     dev = dev->next;
   }
+  return (NULL);
 }
 
 void print_devs(pcap_if_t *alldevsp) {
@@ -100,6 +102,52 @@ void send_tcp_packet(char *ipsrc) {
          sizeof(struct sockaddr_in));
 }
 */
+
+void *thread_routine(void *ptr) {
+  char error_buffer[PCAP_ERRBUF_SIZE];
+  pcap_t *handle;
+  int timeout_limit = 500; /* In milliseconds */
+  thread_data *data = ptr;
+
+  handle = pcap_open_live(data->device, BUFSIZ, 0, timeout_limit, error_buffer);
+  set_filter(handle);
+
+  struct sockaddr src_addr;
+  struct sockaddr dest_addr;
+  t_packet packet;
+
+  struct sockaddr *destpoiteur;
+  lookup_host("google.com", &destpoiteur);
+  u_int32_t src_host;
+  inet_pton(AF_INET, data->pubip, &src_host);
+  ((struct sockaddr_in *)&src_addr)->sin_port = 34443;
+  ((struct sockaddr_in *)&src_addr)->sin_addr.s_addr = src_host;
+  ((struct sockaddr_in *)&src_addr)->sin_port = 1000;
+
+  int sock = create_socket(IPPROTO_TCP);
+  create_scan_packet(UDP, &src_addr, &dest_addr, &packet);
+  sendto(sock, &packet, sizeof(struct packet), 0, ((struct sockaddr *)&dest_addr),
+         sizeof(struct sockaddr_in));
+
+  pcap_dispatch(handle, 0, my_packet_handler, NULL);
+  pcap_close(handle);
+  close(sock);
+  return NULL;
+}
+
+void dispatch_thread(int threads, char *device, char *pubip) {
+  pthread_t thread[MAX_SPEEDUP];
+  thread_data data[MAX_SPEEDUP];
+
+  for (int n = 0; n < threads; n++) {
+    data[n].device = device;
+    data[n].pubip = pubip;
+    pthread_create(&thread[n], NULL, &thread_routine, &data[n]);
+  }
+  for (int n = 0; n < threads; n++)
+    pthread_join(thread[n], NULL);
+}
+
 int main(int argc, char **argv) {
 
   // t_data data;
@@ -109,11 +157,8 @@ int main(int argc, char **argv) {
   // print_data(&data);
   //  execute program
 
-  char *device;
   char error_buffer[PCAP_ERRBUF_SIZE];
-  pcap_t *handle;
   pcap_if_t *alldevsp = 0;
-  int timeout_limit = 1000; /* In milliseconds */
 
   ft_bzero(error_buffer, PCAP_ERRBUF_SIZE);
   if (pcap_findalldevs(&alldevsp, error_buffer)) {
@@ -121,43 +166,16 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  char *str = get_public_ip();
-  char *dev = get_devname_by_ip(alldevsp, str);
-  /* Open device for live capture */
-  handle =
-      pcap_open_live(alldevsp->name, BUFSIZ, 0, timeout_limit, error_buffer);
-
-  if (handle == NULL) {
-    fprintf(stderr, "Could not open device %s: %s\n", device, error_buffer);
+  char *pubip = get_public_ip();
+  char *dev = get_devname_by_ip(alldevsp, pubip);
+  if (!dev)
     return 2;
-  }
 
-  int sendPort = 34344;
-  struct sockaddr src_addr;
-  struct sockaddr dest_addr;
-  t_packet packet;
-
-  struct sockaddr *destpoiteur;
-  lookup_host("google.com", &destpoiteur);
-  u_int32_t src_host;
-  inet_pton(AF_INET, str, &src_host);
-  ((struct sockaddr_in *)&src_addr)->sin_port = 34443;
-  ((struct sockaddr_in *)&src_addr)->sin_addr.s_addr = src_host;
-  ((struct sockaddr_in *)&src_addr)->sin_port = 1000;
-
-  pcap_freealldevs(alldevsp);
-
-  int sock = create_socket(IPPROTO_TCP);
-  create_scan_packet(UDP, &src_addr, &dest_addr, &packet);
-  sendto(sock, &packet, sizeof(struct packet), 0, ((struct sockaddr *)&dest_addr),
-         sizeof(struct sockaddr_in));
-
+  dispatch_thread(1, dev, pubip);
 
   //set_filter(handle);
  // send_tcp_packet(str);
-  free(str);
-  pcap_dispatch(handle, 0, my_packet_handler, NULL);
-
-  pcap_close(handle);
+  pcap_freealldevs(alldevsp);
+  free(pubip);
   return 0;
 }

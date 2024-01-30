@@ -46,7 +46,7 @@ DEBUG_FLAG =  -g3 #-Wall -Wextra -fsanitize=address
 all: $(NAME)
 
 $(NAME) : $(OBJS)
-	@$(CC) $(DEBUG_FLAG) $^ -o $@ -lpcap
+	@$(CC) $(DEBUG_FLAG) $^ -o $@ -lpcap -lpthread
 	@echo "\r"
 	@sudo setcap cap_net_raw=pe $(NAME)
 	@echo "	\033[2K\r$(DARK_BLUE)$(NAME):\t\t$(GREEN)loaded\033[0m"
