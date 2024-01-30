@@ -34,7 +34,8 @@ char *get_devname_by_ip(pcap_if_t *alldevsp, char *ip) {
     }
     srcIpMask = (srcIp & maskp);
     devIpMask = (netp & maskp);
-    if (srcIpMask == devIpMask && devIpMask != 0) return (dev->name);
+    if (srcIpMask == devIpMask && devIpMask != 0)
+      return (dev->name);
     dev = dev->next;
   }
 }
@@ -129,17 +130,16 @@ void send_tcp_packet(char *ipsrc) {
 
 int main(int argc, char **argv) {
 
-  t_data data;
+  // t_data data;
 
   //  if (!parse_arguments(argc, argv, &data)) return (1);
 
   // print_data(&data);
   //  execute program
 
-
-  dprintf(1, "%s\n", get_public_ip());
-
-
+  // char *str = get_public_ip();
+  // dprintf(1, "str = %s\n", str);
+  // return 0;
   char *device;
   char error_buffer[PCAP_ERRBUF_SIZE];
   pcap_t *handle;
@@ -150,28 +150,37 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Error finding devs: %s\n", error_buffer);
     return 1;
   }
-//  print_devs(alldevsp);
+  print_devs(alldevsp);
   char *str = get_public_ip();
-  char *dev = get_devname_by_ip(alldevsp, str);
-  /* Open device for live capture */
-  handle =
-      pcap_open_live(dev, BUFSIZ, 0, timeout_limit, error_buffer);
 
- // print_devs(alldevsp);
+  // dprintf(1, "allo1.2 %s\n", str);
+  char *dev = get_devname_by_ip(alldevsp, "127.0.0.1");
+  /* Open device for live capture */
+  dprintf(1, "allo1\n");
+  handle =
+      pcap_open_live(alldevsp->name, BUFSIZ, 0, timeout_limit, error_buffer);
+  // dprintf(1, "allo1.2 %s\n", dev);
+  // dprintf(1, "allo1.2 %s\n", str);
+
+  // print_devs(alldevsp);
   if (handle == NULL) {
     fprintf(stderr, "Could not open device %s: %s\n", device, error_buffer);
     return 2;
   }
 
+  dprintf(1, "allo2\n");
   pcap_freealldevs(alldevsp);
+  dprintf(1, "allo3\n");
   set_filter(handle);
-  return 0;
-  send_tcp_packet(str);
-  free(str);
+  dprintf(1, "allo4\n");
+  // send_tcp_packet(str);
+  dprintf(1, "allo5\n");
 
-  return 0;
+  // free(str);
+  dprintf(1, "allo6\n");
+  // return 0;
   pcap_dispatch(handle, 0, my_packet_handler, NULL);
 
-  pcap_close(handle);
+  // pcap_close(handle);
   return 0;
 }
