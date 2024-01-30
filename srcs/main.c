@@ -12,6 +12,7 @@ void print_packet_info(const u_char *packet, struct pcap_pkthdr packet_header) {
     if (i % 8 == 0 && i != 0) dprintf(1, "\n");
     dprintf(1, "%02hhx ", packet[i]);
   }
+  dprintf(1, "\n\n");
 }
 
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header,
@@ -131,7 +132,27 @@ int main(int argc, char **argv) {
     return 2;
   }
 
+  int sendPort = 34344;
+  struct sockaddr src_addr;
+  struct sockaddr dest_addr;
+  t_packet packet;
+
+  struct sockaddr *destpoiteur;
+  lookup_host("google.com", &destpoiteur);
+  u_int32_t src_host;
+  inet_pton(AF_INET, str, &src_host);
+  ((struct sockaddr_in *)&src_addr)->sin_port = 34443;
+  ((struct sockaddr_in *)&src_addr)->sin_addr.s_addr = src_host;
+  ((struct sockaddr_in *)&src_addr)->sin_port = 1000;
+
   pcap_freealldevs(alldevsp);
+
+  int sock = create_socket(IPPROTO_TCP);
+  create_scan_packet(UDP, &src_addr, &dest_addr, &packet);
+  sendto(sock, &packet, sizeof(struct packet), 0, ((struct sockaddr *)&dest_addr),
+         sizeof(struct sockaddr_in));
+
+
   //set_filter(handle);
  // send_tcp_packet(str);
   free(str);
