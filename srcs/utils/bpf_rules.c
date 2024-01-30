@@ -1,12 +1,14 @@
 #include "../../includes/ft_nmap.h"
 
 void compile_rule(pcap_t *p, char *rule, struct bpf_program *filter_program) {
-  if (pcap_compile(p, filter_program, rule, 1, PCAP_NETMASK_UNKNOWN)) {
+  if (pcap_compile(p, filter_program, rule, 1, PCAP_NETMASK_UNKNOWN) ==
+      PCAP_ERROR) {
     free(rule);
     fprintf(stderr, "Cant compile portrange rule %s, exiting program...\n",
             pcap_geterr(p));
     exit(0);
   }
+  dprintf(1, "rule [%s] compiled \n", rule);
   free(rule);
 }
 
@@ -36,13 +38,16 @@ void compile_host_rule(
 
 void set_filter(pcap_t *p) {
   struct bpf_program filter_program;
-  const char *str = "greater 200";
+  // const char *str = "greater 200";
 
-  int port_min = 30000;
-  int port_max = 65000;
+  int port_min = 10;
+  int port_max = 1024;  
   compile_portrange_rule(p, port_min, port_max, &filter_program, "src ");
 
-  if (pcap_setfilter(p, &filter_program)) {
+  int pcap_setfilter_control = pcap_setfilter(p, &filter_program);
+
+  if (pcap_setfilter_control == PCAP_ERROR ||
+      pcap_setfilter_control == PCAP_ERROR_NOT_ACTIVATED) {
     fprintf(stderr, "Could not set filter : %s\n", pcap_geterr(p));
     return;
   }

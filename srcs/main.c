@@ -3,6 +3,7 @@
 #include <netinet/in.h>
 #include <pcap.h>
 #include <pcap/pcap.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -60,6 +61,7 @@ u_int32_t htoi(char *host) {
 
   return ((struct sockaddr_in*)destPoiteur)->sin_addr.s_addr;
 }
+
 
 int main(int argc, char **argv) {
   t_data data;

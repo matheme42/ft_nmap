@@ -1,9 +1,10 @@
-#include "ft_nmap.h"
+#include "../includes/ft_nmap.h"
 
-static void create_udp_packet(t_packet *pkt, struct sockaddr *src, struct sockaddr *dst) {
-  uint16_t  dest_port;
-  uint16_t  src_port;
-  uint32_t  dest_addr;
+static void create_udp_packet(t_packet *pkt, struct sockaddr *src,
+                              struct sockaddr *dst) {
+  uint16_t dest_port;
+  uint16_t src_port;
+  uint32_t dest_addr;
 
   dest_port = (uint16_t)((struct sockaddr_in *)dst)->sin_port;
   src_port = (uint16_t)((struct sockaddr_in *)src)->sin_port;

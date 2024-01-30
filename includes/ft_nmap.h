@@ -118,7 +118,8 @@ int create_socket(int protoType);
 
 /* HEADERS */
 void fill_UDP_Header(struct udphdr *udphdr, uint16_t sport, uint16_t dport);
-void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, uint16_t  src_port, uint16_t dst_port);
+void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, uint16_t src_port,
+                     uint16_t dst_port);
 void fill_SHTCP_Header(struct shtcp *header, uint32_t daddr, uint32_t saddr);
 void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t protocol);
 
@@ -174,4 +175,6 @@ bool parse_arguments(int ac, char **av, t_data *data);
 
 void send_packets(thread_data *data, int socket);
 void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip);
+void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header,
+                       const u_char *packet_body);
 #endif
