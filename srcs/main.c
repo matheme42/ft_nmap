@@ -137,9 +137,6 @@ int main(int argc, char **argv) {
   // print_data(&data);
   //  execute program
 
-  // char *str = get_public_ip();
-  // dprintf(1, "str = %s\n", str);
-  // return 0;
   char *device;
   char error_buffer[PCAP_ERRBUF_SIZE];
   pcap_t *handle;
@@ -151,37 +148,24 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Error finding devs: %s\n", error_buffer);
     return 1;
   }
-  print_devs(alldevsp);
-  char *str = get_public_ip();
 
-  // dprintf(1, "allo1.2 %s\n", str);
-  char *dev = get_devname_by_ip(alldevsp, "127.0.0.1");
+  char *str = get_public_ip();
+  char *dev = get_devname_by_ip(alldevsp, str);
   /* Open device for live capture */
-  dprintf(1, "allo1\n");
   handle =
       pcap_open_live(alldevsp->name, BUFSIZ, 0, timeout_limit, error_buffer);
-  // dprintf(1, "allo1.2 %s\n", dev);
-  // dprintf(1, "allo1.2 %s\n", str);
 
-  // print_devs(alldevsp);
   if (handle == NULL) {
     fprintf(stderr, "Could not open device %s: %s\n", device, error_buffer);
     return 2;
   }
 
-  dprintf(1, "allo2\n");
   pcap_freealldevs(alldevsp);
-  dprintf(1, "allo3\n");
   set_filter(handle);
-  dprintf(1, "allo4\n");
-  // send_tcp_packet(str);
-  dprintf(1, "allo5\n");
-
-  // free(str);
-  dprintf(1, "allo6\n");
-  // return 0;
+  send_tcp_packet(str);
+  free(str);
   pcap_dispatch(handle, 0, my_packet_handler, NULL);
 
-  // pcap_close(handle);
+  pcap_close(handle);
   return 0;
 }
