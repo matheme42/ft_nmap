@@ -3,12 +3,22 @@
 #include <netinet/in.h>
 #include <pcap.h>
 #include <pcap/pcap.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <time.h>
 
 void print_packet_info(const u_char *packet, struct pcap_pkthdr packet_header) {
-  printf("Packet capture length: %d\n", packet_header.caplen);
-  printf("Packet total length %d\n", packet_header.len);
+  dprintf(1, "we got %lu bytes\n", packet_header.len);
+  for (int i = 0; i < packet_header.len; i++) {
+    if (i % 8 == 0 && i != 0)
+      dprintf(1, "\n");
+    dprintf(1, "%02hhx ", packet[i]);
+  }
+  dprintf(1, "\n\n");
+
+  t_packet *data = (t_packet *)packet;
+  printf("source port %u\n", ntohs(data->udphdr.source));
+  printf("dest port %u\n", ntohs(data->udphdr.dest));
 }
 
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header,
@@ -39,6 +49,7 @@ char *get_devname_by_ip(pcap_if_t *alldevsp, char *ip) {
       return (dev->name);
     dev = dev->next;
   }
+  return (NULL);
 }
 
 void print_devs(pcap_if_t *alldevsp) {
@@ -65,73 +76,8 @@ void print_devs(pcap_if_t *alldevsp) {
   }
 }
 
-void compile_rule(pcap_t *p, char *rule, struct bpf_program *filter_program) {
-  if (pcap_compile(p, filter_program, rule, 1, PCAP_NETMASK_UNKNOWN)) {
-    free(rule);
-    fprintf(stderr, "Cant compile portrange rule %s, exiting program...\n",
-            pcap_geterr(p));
-    exit(0);
-  }
-  free(rule);
-}
-
-void compile_portrange_rule(
-    pcap_t *p, int port_min, int port_max, struct bpf_program *filter_program,
-    char *port_family) { // port family can be equal to "" "source " or "dest "
-  char *filter = ft_strjoin(port_family, "portrange ");
-  char text[] = "-";
-
-  char *res1 = ft_strjoin(filter, ft_itoa(port_min));
-  char *res2 = ft_strjoin(text, ft_itoa(port_max));
-  char *filter_rule = ft_strjoin(res1, res2);
-  free(res1);
-  free(res2);
-  free(filter);
-  compile_rule(p, filter_rule, filter_program);
-}
-
-void compile_host_rule(
-    pcap_t *p, char *host, struct bpf_program *filter_program,
-    char *host_family) { // can be equal to "" or "src " or "dst "
-  char *temp = ft_strjoin(host_family, "host ");
-  char *filter_rule = ft_strjoin(temp, host);
-  free(temp);
-  compile_rule(p, filter_rule, filter_program);
-}
-
-void set_filter(pcap_t *p) {
-  struct bpf_program filter_program;
-  const char *str = "greater 200";
-
-  int port_min = 30000;
-  int port_max = 65000;
-  compile_portrange_rule(p, port_min, port_max, &filter_program, "src ");
-
-  if (pcap_setfilter(p, &filter_program)) {
-    fprintf(stderr, "Could not set filter : %s\n", pcap_geterr(p));
-    return;
-  }
-  free(filter_program.bf_insns);
-}
-
-// int create_socket() {
-//   int sockId;
-//   int option;
-//
-//   if ((sockId = socket(PF_INET, SOCK_RAW, IPPROTO_TCP)) < 0) {
-//     dprintf(2, "ft_traceroute: Socket creation failed\n");
-//     return 0;
-//   }
-//
-//   // set custom header to true
-//   option = 1;
-//   if (setsockopt(sockId, IPPROTO_IP, IP_HDRINCL, &option, sizeof(option))) {
-//     dprintf(2, "ft_traceroute: Failed to set socket option\n");
-//     return 0;
-//   }
-//   return (sockId);
-// }
-
+/*
+>>>>>>> main
 void send_tcp_packet(char *ipsrc) {
   struct packet pkt;
   struct sockaddr *addr;
@@ -161,6 +107,52 @@ void send_tcp_packet(char *ipsrc) {
   sendto(sock, &pkt, sizeof(struct packet), 0, ((struct sockaddr *)addr),
          sizeof(struct sockaddr_in));
 }
+*/
+
+void *thread_routine(void *ptr) {
+  char error_buffer[PCAP_ERRBUF_SIZE];
+  pcap_t *handle;
+  int timeout_limit = 500; /* In milliseconds */
+  thread_data *data = ptr;
+
+  handle = pcap_open_live(data->device, BUFSIZ, 0, timeout_limit, error_buffer);
+  set_filter(handle);
+
+  struct sockaddr src_addr;
+  struct sockaddr dest_addr;
+  t_packet packet;
+
+  struct sockaddr *destpoiteur;
+  lookup_host("google.com", &destpoiteur);
+  u_int32_t src_host;
+  inet_pton(AF_INET, data->pubip, &src_host);
+  ((struct sockaddr_in *)&src_addr)->sin_port = 34443;
+  ((struct sockaddr_in *)&src_addr)->sin_addr.s_addr = src_host;
+  ((struct sockaddr_in *)&src_addr)->sin_port = 1000;
+
+  int sock = create_socket(IPPROTO_TCP);
+  create_scan_packet(UDP, &src_addr, &dest_addr, &packet);
+  sendto(sock, &packet, sizeof(struct packet), 0,
+         ((struct sockaddr *)&dest_addr), sizeof(struct sockaddr_in));
+
+  pcap_dispatch(handle, 0, my_packet_handler, NULL);
+  pcap_close(handle);
+  close(sock);
+  return NULL;
+}
+
+void dispatch_thread(int threads, char *device, char *pubip) {
+  pthread_t thread[MAX_SPEEDUP];
+  thread_data data[MAX_SPEEDUP];
+
+  for (int n = 0; n < threads; n++) {
+    data[n].device = device;
+    data[n].pubip = pubip;
+    pthread_create(&thread[n], NULL, &thread_routine, &data[n]);
+  }
+  for (int n = 0; n < threads; n++)
+    pthread_join(thread[n], NULL);
+}
 
 int main(int argc, char **argv) {
 
@@ -171,11 +163,8 @@ int main(int argc, char **argv) {
   // print_data(&data);
   //  execute program
 
-  char *device;
   char error_buffer[PCAP_ERRBUF_SIZE];
-  pcap_t *handle;
   pcap_if_t *alldevsp = 0;
-  int timeout_limit = 1000; /* In milliseconds */
 
   ft_bzero(error_buffer, PCAP_ERRBUF_SIZE);
   if (pcap_findalldevs(&alldevsp, error_buffer)) {
@@ -183,23 +172,16 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  char *str = get_public_ip();
-  char *dev = get_devname_by_ip(alldevsp, str);
-  /* Open device for live capture */
-  handle =
-      pcap_open_live(alldevsp->name, BUFSIZ, 0, timeout_limit, error_buffer);
-
-  if (handle == NULL) {
-    fprintf(stderr, "Could not open device %s: %s\n", device, error_buffer);
+  char *pubip = get_public_ip();
+  char *dev = get_devname_by_ip(alldevsp, pubip);
+  if (!dev)
     return 2;
-  }
 
+  dispatch_thread(1, dev, pubip);
+
+  // set_filter(handle);
+  // send_tcp_packet(str);
   pcap_freealldevs(alldevsp);
-  set_filter(handle);
-  send_tcp_packet(str);
-  free(str);
-  pcap_dispatch(handle, 0, my_packet_handler, NULL);
-
-  pcap_close(handle);
+  free(pubip);
   return 0;
 }

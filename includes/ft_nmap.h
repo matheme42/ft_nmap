@@ -77,6 +77,13 @@ typedef struct s_scan {
   };
 } t_scan;
 
+typedef enum {UDP, FIN, SYN, XMAS, NUL, ACK} E_SCAN;
+
+typedef struct {
+  char *pubip;
+  char *device;
+} thread_data;
+
 typedef struct s_data {
   short ports[1024]; // ports need to be scan store as a list
   short ports_number;
@@ -108,8 +115,8 @@ char *get_public_ip();
 int create_socket(int protoType);
 
 /* HEADERS */
-void fill_UDP_Header(struct udphdr *udphdr, int port);
-void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags);
+void fill_UDP_Header(struct udphdr *udphdr, uint16_t sport, uint16_t dport);
+void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, uint16_t  src_port, uint16_t dst_port);
 void fill_SHTCP_Header(struct shtcp *header, uint32_t daddr, uint32_t saddr);
 void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t protocol);
 
@@ -159,4 +166,6 @@ void usage();
 void free_data(t_data *data);
 
 // ****************** OTHERS SECTIONS ****************** //
+
+void create_scan_packet(E_SCAN scan, struct sockaddr *src, struct sockaddr *dst, t_packet *pkt);
 #endif

@@ -7,6 +7,7 @@ void compile_rule(pcap_t *p, char *rule, struct bpf_program *filter_program) {
             pcap_geterr(p));
     exit(0);
   }
+  dprintf(1, "rule [%s] compiled \n", rule);
   free(rule);
 }
 
@@ -36,7 +37,7 @@ void compile_host_rule(
 
 void set_filter(pcap_t *p) {
   struct bpf_program filter_program;
-  const char *str = "greater 200";
+  // const char *str = "greater 200";
 
   int port_min = 30000;
   int port_max = 65000;

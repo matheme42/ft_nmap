@@ -1,8 +1,8 @@
 #include "../../includes/ft_nmap.h"
 
-void fill_UDP_Header(struct udphdr *udphdr, int port) {
-  udphdr->source = INADDR_ANY;
-  udphdr->dest = htons(port);
+void fill_UDP_Header(struct udphdr *udphdr, uint16_t sport, uint16_t dport) {
+  udphdr->source = htons(sport);
+  udphdr->dest = htons(dport);
   udphdr->len = htons(sizeof(struct packet) - sizeof(struct iphdr));
   udphdr->check = 0;
 }
@@ -22,16 +22,18 @@ unsigned short checksum(void *b, int len) {
   return result;
 }
 
-void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags) {
+void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, uint16_t  src_port, uint16_t dst_port) {
   ft_bzero(tcphdr, sizeof(struct tcphdr));
-  tcphdr->source = htons(48927);
-  tcphdr->dest = htons(443);
+  tcphdr->source = htons(src_port);
+  tcphdr->dest = htons(dst_port);
   tcphdr->seq = 0;
   tcphdr->ack_seq = 0;
   tcphdr->doff = sizeof(struct tcphdr) / 4;
   tcphdr->ack = flags.type.ack;
   tcphdr->syn = flags.type.syn;
-  tcphdr->fin = flags.type.fin;
+  tcphdr->fin = flags.type.fin || flags.type.xmas;
+  tcphdr->urg = flags.type.xmas;
+  tcphdr->psh = flags.type.xmas;
   tcphdr->res1 = 0;
   tcphdr->window = 65535;
   tcphdr->urg_ptr = 0;
