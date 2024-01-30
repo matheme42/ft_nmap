@@ -77,12 +77,11 @@ typedef struct s_scan {
   };
 } t_scan;
 
-typedef enum {UDP, FIN, SYN, XMAS, NUL, ACK} E_SCAN;
-
 typedef struct {
   u_int32_t pubip;
   u_int32_t destip;
   u_int16_t ports[1024];
+  t_scan    scan;
   int       nb_port;
   char      *device;
 } thread_data;
@@ -168,8 +167,11 @@ void usage();
 // free parsed data
 void free_data(t_data *data);
 
+//
+bool parse_arguments(int ac, char **av, t_data *data);
+
 // ****************** OTHERS SECTIONS ****************** //
 
-void send_packet(thread_data *data, int socket);
-void dispatch_thread(int threads, char *device, u_int32_t pubip);
+void send_packets(thread_data *data, int socket);
+void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip);
 #endif

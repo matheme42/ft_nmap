@@ -1,5 +1,6 @@
-#include "../includes/ft_nmap.h"
+#include "ft_nmap.h"
 #include <pthread.h>
+#include <string.h>
 
 void print_packet_info(const uint8_t *packet, struct pcap_pkthdr packet_header) {
   dprintf(1, "we got %u bytes\n", packet_header.len);
@@ -23,12 +24,14 @@ static void *thread_routine(void *ptr) {
     int socket;
     thread_data *data = ptr;
 
+    if (data->nb_port == 0) return NULL;
+
     if (!(socket = create_socket(IPPROTO_TCP)) ||
         !(handle = pcap_open_live(data->device, BUFSIZ, 0, timeout_limit, error_buffer)))
         return (NULL);
-    set_filter(handle);
+   // set_filter(handle);
 
-    send_packet(data, socket);
+    send_packets(data, socket);
 
     pcap_dispatch(handle, 0, my_packet_handler, NULL);
     pcap_close(handle);
@@ -36,15 +39,31 @@ static void *thread_routine(void *ptr) {
     return NULL;
 }
 
-void dispatch_thread(int threads, char *device, u_int32_t pubip) {
+void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip) {
   pthread_t thread[MAX_SPEEDUP];
-  thread_data data[MAX_SPEEDUP];
+  thread_data thread_data[MAX_SPEEDUP];
 
-  for (int n = 0; n < threads; n++) {
-    data[n].device = device;
-    data[n].pubip = pubip;
-    pthread_create(&thread[n], NULL, &thread_routine, &data[n]);
+  int threadPortRange = data->ports_number / data->speedup;
+  for (int n = 0; n < data->speedup; n++) {
+    thread_data[n].device = device;
+    thread_data[n].pubip = pubip;
+    thread_data[n].destip = desip;
+    thread_data[n].scan = data->scanmask;
+
+    // set port number
+    if (n == data->speedup - 1 && data->speedup > 1) {
+      thread_data[n].nb_port = data->ports_number - (threadPortRange * data->speedup);
+    } else {
+      thread_data[n].nb_port = threadPortRange;
+    }
+
+    // fill port range
+    memcpy(thread_data[n].ports, &data->ports[n * threadPortRange], thread_data[n].nb_port * sizeof(short));
+    
+
+
+    pthread_create(&thread[n], NULL, &thread_routine, &thread_data[n]);
   }
-  for (int n = 0; n < threads; n++)
+  for (int n = 0; n < data->speedup; n++)
     pthread_join(thread[n], NULL);
 }

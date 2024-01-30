@@ -52,63 +52,42 @@ void print_devs(pcap_if_t *alldevsp) {
   }
 }
 
-/*
-void send_tcp_packet(char *ipsrc) {
-  struct packet pkt;
-  struct sockaddr *addr;
-  t_scan flag;
+u_int32_t htoi(char *host) {
+  struct sockaddr dest;
+  struct sockaddr *destPoiteur = &dest;
 
-  lookup_host("google.com", &addr);
+  lookup_host(host, &destPoiteur);
 
-  int sock = create_socket(IPPROTO_TCP);
-
-  flag.mask = 0;
-  flag.type.ack = 0;
-  ((struct sockaddr_in *)addr)->sin_family = AF_INET;
-  ((struct sockaddr_in *)addr)->sin_port = htons(443);
-
-  int src;
-  inet_pton(AF_INET, ipsrc, &src);
-
-  fill_SHTCP_Header(&pkt.shtcp.hdr,
-                    (uint32_t)((struct sockaddr_in *)addr)->sin_addr.s_addr,
-                    src);
-  fill_TCP_Header(&pkt.tcphdr, flag);
-  pkt.tcphdr.check =
-      checksum(&pkt.shtcp.hdr, sizeof(struct shtcp) + sizeof(struct tcphdr));
-  fill_IP_Header(&pkt.iphdr,
-                 (uint32_t)((struct sockaddr_in *)addr)->sin_addr.s_addr,
-                 IPPROTO_TCP);
-  sendto(sock, &pkt, sizeof(struct packet), 0, ((struct sockaddr *)addr),
-         sizeof(struct sockaddr_in));
+  return ((struct sockaddr_in*)destPoiteur)->sin_addr.s_addr;
 }
-*/
 
 int main(int argc, char **argv) {
-
-  // t_data data;
-
-  //  if (!parse_arguments(argc, argv, &data)) return (1);
-
-  // print_data(&data);
-  //  execute program
-
+  t_data data;
   char error_buffer[PCAP_ERRBUF_SIZE];
   pcap_if_t *alldevsp;
-  char      *dev;
   u_int32_t pubip;
+  char      *dev;
 
+  if (!parse_arguments(argc, argv, &data)) return (1);
+  print_data(&data);
+  
   ft_bzero(error_buffer, PCAP_ERRBUF_SIZE);
   if (pcap_findalldevs(&alldevsp, error_buffer)) {
     fprintf(stderr, "Error finding devs: %s\n", error_buffer);
     return 1;
   }
 
-  if (!(pubip = get_public_ip("google.com")) ||
-      !(dev = get_devname_by_ip(alldevsp, pubip)))
-    return 2;
+  int i = -1;
+  while (*data.ip_address) {
+    dprintf(1, "\nscanning: %s\n", *data.ip_address);
 
-  dispatch_thread(1, dev, pubip);
+
+    pubip = get_public_ip(*data.ip_address);
+    if (!(dev = get_devname_by_ip(alldevsp, pubip))) continue;
+    dispatch_thread(&data, dev, pubip, htoi(*data.ip_address));
+    data.ip_address++;
+  }
+  
   pcap_freealldevs(alldevsp);
   return 0;
 }

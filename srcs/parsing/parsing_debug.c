@@ -1,20 +1,17 @@
 #include "../../includes/ft_nmap.h"
 
 void print_data(t_data *data) {
-  dprintf(1, "speedup: %d\n", data->speedup);
-  dprintf(1, "mask: (%s %s %s %s %s %s)\n",
-          data->scanmask.type.ack ? "ACK" : "",
-          data->scanmask.type.fin ? "FIN" : "",
-          data->scanmask.type.null ? "NULL" : "",
-          data->scanmask.type.syn ? "SYN" : "",
-          data->scanmask.type.udp ? "UDP" : "",
-          data->scanmask.type.xmas ? "XMAS" : "");
-  dprintf(1, "port number: %d\n", data->ports_number);
-  char **str = data->ip_address;
+
+  dprintf(1, "Scan Configurations\n");
+  dprintf(1, "Target Ip-Address : ");
   int i = 0;
-  while (str[i]) {
-    dprintf(1, "%s ", str[i]);
-    i++;
-  }
+  while (data->ip_address[i]) dprintf(1, "%s ", data->ip_address[i++]);
   dprintf(1, "\n");
+
+  dprintf(1, "No of Ports to scan : %d\n", data->ports_number);
+  t_scan mask = data->scanmask;
+  dprintf(1, "Scans to be performed : ");
+  dprintf(1, "%s %s %s %s %s %s\n", mask.type.ack ? "ACK" : "", mask.type.fin ? "FIN" : "", mask.type.null ? "NULL" : "", mask.type.syn ? "SYN" : "", mask.type.udp ? "UDP" : "", mask.type.xmas ? "XMAS" : "");
+  dprintf(1, "No of threads : %d\n", data->speedup);
+  dprintf(1, "Scanning...\n");
 }
