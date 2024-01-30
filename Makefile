@@ -23,7 +23,7 @@ INC_PATH= includes
 INC= $(INC_PATH)/*
 
 
-NAME_SRC= main.c packet.c
+NAME_SRC= main.c packet.c thread.c
 
 NAME_SRC_PARSING= $(shell cd $(PARSING_PATH); ls *.c)
 NAME_SRC_UTILS= $(shell cd $(UTILS_PATH); ls *.c)

@@ -41,7 +41,7 @@ void set_filter(pcap_t *p) {
   // const char *str = "greater 200";
 
   int port_min = 30000;
-  int port_max = 65000;
+  int port_max = 35000;
   compile_portrange_rule(p, port_min, port_max, &filter_program, "src ");
 
   int pcap_setfilter_control = pcap_setfilter(p, &filter_program);
