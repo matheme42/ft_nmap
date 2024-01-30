@@ -5,6 +5,7 @@ void send_dummy_bytes(int sockFd, struct sockaddr *addr) {
   // 216.58.214.174: ip google
   t_packet dummy_packet;
 
+  ft_bzero(&dummy_packet, sizeof(t_packet));
   lookup_host("google.com", &addr);
   ((struct sockaddr_in *)addr)->sin_family = AF_INET;
   ((struct sockaddr_in *)addr)->sin_port = htons(33434);
@@ -21,9 +22,9 @@ char *recieve_data(int sockFd, struct sockaddr *addr) {
   struct iovec retMsgData;
   struct msghdr messageHdr;
 
-  ft_memset(recieve, 0, 100);
-  ft_memset(&retMsgData, 0, sizeof(struct iovec));
-  ft_memset(&messageHdr, 0, sizeof(struct msghdr));
+  ft_bzero(recieve, 100);
+  ft_bzero(&retMsgData, sizeof(struct iovec));
+  ft_bzero(&messageHdr, sizeof(struct msghdr));
 
   retMsgData.iov_base = &recieve;
   retMsgData.iov_len = 0;
@@ -58,10 +59,10 @@ char *recieve_data(int sockFd, struct sockaddr *addr) {
 
 char *get_public_ip() {
   int sockFd = create_socket(IPPROTO_UDP);
-  struct sockaddr *addr;
+  struct sockaddr addr;
 
-  send_dummy_bytes(sockFd, addr);
-  char *publicIp = recieve_data(sockFd, addr);
+  send_dummy_bytes(sockFd, &addr);
+  char *publicIp = recieve_data(sockFd, &addr);
   // read_public_ip(sockFd);
   //  char *wait = "wait";
   close(sockFd);

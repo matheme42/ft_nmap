@@ -143,9 +143,10 @@ int main(int argc, char **argv) {
   char *device;
   char error_buffer[PCAP_ERRBUF_SIZE];
   pcap_t *handle;
-  pcap_if_t *alldevsp;
+  pcap_if_t *alldevsp = 0;
   int timeout_limit = 1000; /* In milliseconds */
 
+  ft_bzero(error_buffer, PCAP_ERRBUF_SIZE);
   if (pcap_findalldevs(&alldevsp, error_buffer)) {
     fprintf(stderr, "Error finding devs: %s\n", error_buffer);
     return 1;
