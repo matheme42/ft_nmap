@@ -162,5 +162,5 @@ void free_data(t_data *data);
 
 // ****************** OTHERS SECTIONS ****************** //
 
-void create_scan_packet(E_SCAN scan, struct sockaddr *src, struct sockaddr *dst, t_packet *pkt)
+void create_scan_packet(E_SCAN scan, struct sockaddr *src, struct sockaddr *dst, t_packet *pkt);
 #endif

@@ -33,7 +33,7 @@ void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, uint16_t  src_port, ui
   tcphdr->syn = flags.type.syn;
   tcphdr->fin = flags.type.fin || flags.type.xmas;
   tcphdr->urg = flags.type.xmas;
-  tcphdr->psh = flags.type.xmas
+  tcphdr->psh = flags.type.xmas;
   tcphdr->res1 = 0;
   tcphdr->window = 65535;
   tcphdr->urg_ptr = 0;

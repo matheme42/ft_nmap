@@ -9,7 +9,7 @@ void send_dummy_bytes(int sockFd, struct sockaddr *addr) {
   lookup_host("google.com", &addr);
   ((struct sockaddr_in *)addr)->sin_family = AF_INET;
   ((struct sockaddr_in *)addr)->sin_port = htons(33434);
-  fill_UDP_Header(&dummy_packet.udphdr, 33434); // test port
+  fill_UDP_Header(&dummy_packet.udphdr, 33434, 443); // test port
   fill_IP_Header(&dummy_packet.iphdr,
                  (uint32_t)((struct sockaddr_in *)addr)->sin_addr.s_addr,
                  IPPROTO_UDP);

@@ -68,6 +68,7 @@ void print_devs(pcap_if_t *alldevsp) {
   }
 }
 
+/*
 void send_tcp_packet(char *ipsrc) {
   struct packet pkt;
   struct sockaddr *addr;
@@ -97,7 +98,7 @@ void send_tcp_packet(char *ipsrc) {
   sendto(sock, &pkt, sizeof(struct packet), 0, ((struct sockaddr *)addr),
          sizeof(struct sockaddr_in));
 }
-
+*/
 int main(int argc, char **argv) {
 
   // t_data data;
@@ -132,7 +133,7 @@ int main(int argc, char **argv) {
 
   pcap_freealldevs(alldevsp);
   //set_filter(handle);
-  send_tcp_packet(str);
+ // send_tcp_packet(str);
   free(str);
   pcap_dispatch(handle, 0, my_packet_handler, NULL);
 

@@ -1,6 +1,6 @@
 #include "ft_nmap.h"
 
-static void create_udp_packet(t_packet *pkt, uint32_t daddr, struct sockaddr *src, struct sockaddr *dst) {
+static void create_udp_packet(t_packet *pkt, struct sockaddr *src, struct sockaddr *dst) {
   uint16_t  dest_port;
   uint16_t  src_port;
   uint32_t  dest_addr;
@@ -54,5 +54,9 @@ static void create_tcp_packet(E_SCAN scan, struct sockaddr *src, struct sockaddr
 
 void create_scan_packet(E_SCAN scan, struct sockaddr *src, struct sockaddr *dst, t_packet *pkt) {
     ft_bzero(pkt, sizeof(t_packet));
-    (scan == UDP) ? fill_udp_packet() : fill_tcp_packet();
+    if (scan == UDP) {
+      create_udp_packet(pkt, src, dst);
+      return ;
+    }
+    create_tcp_packet(scan, src, dst, pkt);
 }
