@@ -109,7 +109,7 @@ int create_socket(int protoType);
 
 /* HEADERS */
 void fill_UDP_Header(struct udphdr *udphdr, uint16_t sport, uint16_t dport);
-void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags);
+void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, uint16_t  src_port, uint16_t dst_port);
 void fill_SHTCP_Header(struct shtcp *header, uint32_t daddr, uint32_t saddr);
 void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t protocol);
 
