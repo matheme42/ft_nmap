@@ -23,7 +23,7 @@ INC_PATH= includes
 INC= $(INC_PATH)/*
 
 
-NAME_SRC= main.c
+NAME_SRC= main.c packet.c
 
 NAME_SRC_PARSING= $(shell cd $(PARSING_PATH); ls *.c)
 NAME_SRC_UTILS= $(shell cd $(UTILS_PATH); ls *.c)
@@ -47,6 +47,7 @@ all: $(NAME)
 
 $(NAME) : $(OBJS)
 	@$(CC) $(DEBUG_FLAG) $^ -o $@ -lpcap
+	@echo "\r"
 	@sudo setcap cap_net_raw=pe $(NAME)
 	@echo "	\033[2K\r$(DARK_BLUE)$(NAME):\t\t$(GREEN)loaded\033[0m"
 

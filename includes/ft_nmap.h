@@ -77,6 +77,8 @@ typedef struct s_scan {
   };
 } t_scan;
 
+typedef enum {UDP, FIN, SYN, XMAS, NUL, ACK} E_SCAN;
+
 typedef struct s_data {
   short ports[1024]; // ports need to be scan store as a list
   short ports_number;
@@ -148,4 +150,6 @@ void usage();
 void free_data(t_data *data);
 
 // ****************** OTHERS SECTIONS ****************** //
+
+void create_scan_packet(char *scan, char *src_host, char *dest_host, char *dest_port);
 #endif

@@ -6,8 +6,11 @@
 #include <time.h>
 
 void print_packet_info(const u_char *packet, struct pcap_pkthdr packet_header) {
-  printf("Packet capture length: %d\n", packet_header.caplen);
-  printf("Packet total length %d\n", packet_header.len);
+  dprintf(1, "we got %lu bytes\n", packet_header.len);
+  for (int i = 0; i < packet_header.len; i++) {
+    if (i % 8 == 0 && i != 0) dprintf(1, "\n");
+    dprintf(1, "%02hhx ", packet[i]);
+  }
 }
 
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header,
@@ -80,24 +83,6 @@ void set_filter(pcap_t *p) {
   // pcap_freecode(&program);
 }
 
-// int create_socket() {
-//   int sockId;
-//   int option;
-//
-//   if ((sockId = socket(PF_INET, SOCK_RAW, IPPROTO_TCP)) < 0) {
-//     dprintf(2, "ft_traceroute: Socket creation failed\n");
-//     return 0;
-//   }
-//
-//   // set custom header to true
-//   option = 1;
-//   if (setsockopt(sockId, IPPROTO_IP, IP_HDRINCL, &option, sizeof(option))) {
-//     dprintf(2, "ft_traceroute: Failed to set socket option\n");
-//     return 0;
-//   }
-//   return (sockId);
-// }
-
 void send_tcp_packet(char *ipsrc) {
   struct packet pkt;
   struct sockaddr *addr;
@@ -161,7 +146,7 @@ int main(int argc, char **argv) {
   }
 
   pcap_freealldevs(alldevsp);
-  set_filter(handle);
+  //set_filter(handle);
   send_tcp_packet(str);
   free(str);
   pcap_dispatch(handle, 0, my_packet_handler, NULL);
