@@ -1,12 +1,99 @@
 #include "ft_nmap.h"
 #include <signal.h>
 
+int get_packet_port(t_trame *trame) {
+  char *data;
+
+  switch (trame->iphdr.protocol)
+  {
+    case IPPROTO_UDP:
+      return htons(trame->udphdr.source);
+    case IPPROTO_TCP:
+      return htons(trame->tcphdr.source);
+    case IPPROTO_ICMP:
+      data = (char*)trame;
+      data = &data[sizeof(t_trame)];
+      t_packet *send_packet = (t_packet*)data;
+      return htons(send_packet->tcphdr.dest);
+  default:
+    return 0;
+  }
+}
+
+short get_port_id(short *ports, short port_number, const unsigned short port) {
+  for (int i = 0; i < port_number; i++) {
+    if (ports[i] == port) return i;
+  }
+  return -1;
+}
+
+void analize_response(t_scan current_scan, char packet_type, t_response *response) {
+  switch (current_scan.mask) {
+    case 0b1: //SYN
+      /* code */
+      break;
+    case 0b10: //NULL
+      /* code */
+      break;
+    case 0b100: //ACK
+      /* code */
+      break;
+    case 0b1000: //FIN
+      /* code */
+      break;
+    case 0b10000: //XMAS
+      /* code */
+      break;
+    case 0b100000: //UDP
+      /* code */
+      break;
+    default:
+      break;
+  }
+}
+// 0 --> UDP
+// 1 --> SYN/ACK
+// 2 --> RST
+// 3 --> ICMP code 3
+// 4 --> ICMP autre code
+// -1 --> error
+char simplifize_response(t_trame *trame) {
+  uint8_t code = 0;
+ switch (trame->iphdr.protocol)
+  {
+    case IPPROTO_UDP:
+      return 0; // response udp
+    case IPPROTO_TCP:
+      if (trame->tcphdr.ack == 1 && trame->tcphdr.syn == 1) return 1;
+      if (trame->tcphdr.rst == 1) return 2;
+      return -1;
+    case IPPROTO_ICMP:
+      if (trame->icmphdr.type == 3) {
+        if (trame->icmphdr.code == 3) {
+          code = trame->icmphdr.code;
+          return 3;
+        }
+        else if (code == 1 || code == 2 || code == 3 || code == 9 || code == 10 || code == 13) {
+          return 4;
+        }
+      }
+      return -1;
+    default:
+      return -1;
+  }
+}
+
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body) {
   t_trame *trame = (t_trame *)packet_body;
   thread_data *data = (thread_data *)args;
-  if (data->destip == trame->iphdr.daddr) return ;
-
-  t_response response; 
+  if ((data->destip == trame->iphdr.daddr && data->destip != 16777343) && trame->iphdr.id != getpid()) return ;
+  
+  unsigned short port = get_packet_port(trame);
+  short id = get_port_id(data->ports, data->nb_port, port);
+  if (id < 0) return ;
+ // dprintf(1, "%d\n", id);
+  char response_type = simplifize_response(trame);
+  analize_response(data->current_scan, response_type, &(data->response[id]));
   print_packet_info(trame, *packet_header);
   return;
 }
@@ -47,13 +134,14 @@ void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desi
   pthread_t thread[MAX_SPEEDUP];
   thread_data thread_data[MAX_SPEEDUP];
 
+  ft_bzero(thread_data, sizeof(thread_data));
+
   float threadPortRange = data->ports_number / (float)data->speedup;
   for (int n = 0; n < data->speedup; n++) {
     thread_data[n].device = device;
     thread_data[n].pubip = pubip;
     thread_data[n].destip = desip;
     thread_data[n].scan = data->scanmask;
-
     // fill port range
     thread_data[n].nb_port = (int)(threadPortRange * (n + 1)) - (int)(threadPortRange * n);
     memcpy(thread_data[n].ports, &data->ports[(int)(n * threadPortRange)], thread_data[n].nb_port * sizeof(short));
