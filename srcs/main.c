@@ -62,6 +62,31 @@ u_int32_t htoi(char *host) {
   return ((struct sockaddr_in*)destPoiteur)->sin_addr.s_addr;
 }
 
+void		ft_quicksort(uint16_t *tab, int len)
+{
+	uint16_t compa;
+	uint16_t	tmp;
+	int		n;
+	int		m;
+
+	if (len < 2)
+		return ;
+	compa = tab[(len - 1)];
+	m = 0;
+	n = -1;
+	while (++n < len)
+		if (tab[n] <= compa) {
+			if (m != n) {
+				tmp = tab[m];
+				tab[m] = tab[n];
+				tab[n] = tmp;
+			}
+			m++;
+		}
+	ft_quicksort(tab, --m);
+	ft_quicksort(&tab[m], len - m);
+}
+
 
 int main(int argc, char **argv) {
   t_data data;
@@ -72,7 +97,8 @@ int main(int argc, char **argv) {
 
   if (!parse_arguments(argc, argv, &data)) return (1);
   print_data(&data);
-  
+  ft_quicksort(data.ports, data.ports_number);
+
   ft_bzero(error_buffer, PCAP_ERRBUF_SIZE);
   if (pcap_findalldevs(&alldevsp, error_buffer)) {
     fprintf(stderr, "Error finding devs: %s\n", error_buffer);
