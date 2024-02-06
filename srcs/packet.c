@@ -42,28 +42,14 @@ void create_scan_packet(t_scan scan, struct sockaddr *src, struct sockaddr *dst,
 void send_packets(thread_data *data, int socket) {
     struct sockaddr src_addr;
     struct sockaddr dest_addr;
-    t_packet packet;
-    t_scan local_scan;
+    t_packet        packet;
 
-    for (int i = 0; i < 6; i++) {
-      local_scan.mask = 0;
-      if (i == 0) local_scan.type.ack = data->scan.type.ack;
-      else if (i == 1) local_scan.type.fin = data->scan.type.fin;
-      else if (i == 2) local_scan.type.null = data->scan.type.null;
-      else if (i == 3) local_scan.type.syn = data->scan.type.syn;
-      else if (i == 4) local_scan.type.udp = data->scan.type.udp;
-      else if (i == 5) local_scan.type.xmas = data->scan.type.xmas;
-
-      if (local_scan.mask == 0) continue;
-      for (short port_idx = 0; port_idx < data->nb_port; port_idx++) {
+    for (short port_idx = 0; port_idx < data->nb_port; port_idx++) {
       ((struct sockaddr_in *)&src_addr)->sin_addr.s_addr = data->pubip;
-        ((struct sockaddr_in *)&src_addr)->sin_port = 34443 + port_idx;  
-
-        ((struct sockaddr_in *)&dest_addr)->sin_addr.s_addr = data->destip;
-        ((struct sockaddr_in *)&dest_addr)->sin_port = data->ports[port_idx];
-
-        create_scan_packet(local_scan, &src_addr, &dest_addr, &packet);
-        sendto(socket, &packet, sizeof(struct packet), 0, ((struct sockaddr *)&dest_addr), sizeof(struct sockaddr_in));
-      }
+      ((struct sockaddr_in *)&src_addr)->sin_port = 34443 + port_idx;  
+      ((struct sockaddr_in *)&dest_addr)->sin_addr.s_addr = data->destip;
+      ((struct sockaddr_in *)&dest_addr)->sin_port = data->ports[port_idx];
+      create_scan_packet(data->current_scan, &src_addr, &dest_addr, &packet);
+      sendto(socket, &packet, sizeof(struct packet), 0, ((struct sockaddr *)&dest_addr), sizeof(struct sockaddr_in));
     }
 }

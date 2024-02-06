@@ -96,12 +96,29 @@ typedef struct s_scan {
   };
 } t_scan;
 
+
+typedef enum {S_OPEN, S_CLOSED, S_FILTERED} SYN_RESPONSE;
+typedef enum {A_UNFILTERED, A_FILTERED} ACK_RESPONSE;
+typedef enum {F_OPEN_FILTERED, F_CLOSED, F_FILTERED} FINNULLXMAS_RESPONSE;
+typedef enum {U_OPEN_FILTERED, U_CLOSED, U_FILTERED} UDP_RESPONSE;
+
+typedef struct {
+  char syn:2;
+  char ack:1;
+  char fin:2;
+  char null:2;
+  char xmas:2;
+  char udp:2;
+} t_response;
+
 typedef struct {
   u_int32_t pubip;
   u_int32_t destip;
   u_int16_t ports[1024];
+  t_response response[1024];
   t_scan    scan;
   int       nb_port;
+  t_scan    current_scan;
   char      *device;
 } thread_data;
 
@@ -197,4 +214,5 @@ void send_packets(thread_data *data, int socket);
 void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip);
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body);
 void print_packet_info(t_trame *trame, struct pcap_pkthdr packet_header);
+void clear_filter(pcap_t *p);
 #endif
