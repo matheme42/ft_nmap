@@ -30,6 +30,7 @@
 #define __USE_MISC
 #endif
 #include <netinet/tcp.h>
+#include <limits.h>
 
 typedef int bool; // définition du type booléen,
 
@@ -162,7 +163,8 @@ void set_speedup_value(char *value, t_data *data);
 
 // option --ports
 #define MIN_PORT 1
-#define MAX_PORT 1024
+#define MAX_PORT USHRT_MAX
+#define MAX_PORT_NUMBER 1024
 void set_ports_value(char *str, t_data *data);
 
 // option --help

@@ -19,12 +19,12 @@ static void set_ports_value_from_range(char *str, t_data *data) {
   char **split_data = ft_strsplit(str, '-', &len);
   if (split_data == NULL) {
     fprintf(stderr, "low memory can't store some data\n");
-    return;
+    exit(2);
   }
   if (len != 2) {
     fprintf(stderr, "Invalide range for option ports\n");
     free_tab(split_data);
-    return;
+    exit(2);
   }
   v1 = ft_atoi(split_data[0]);
   v2 = ft_atoi(split_data[1]);
@@ -32,7 +32,7 @@ static void set_ports_value_from_range(char *str, t_data *data) {
   if (v1 < MIN_PORT || v1 > MAX_PORT || v2 < MIN_PORT || v2 > MAX_PORT) {
     fprintf(stderr, "Invalide range for option ports: (MIN: %d MAX: %d)\n",
             MIN_PORT, MAX_PORT);
-    return;
+    exit(2);
   }
 
   if (v1 > v2) {
@@ -46,6 +46,12 @@ static void set_ports_value_from_range(char *str, t_data *data) {
     *(data->ports) = v1;
     return;
   }
+
+  if ((end_port - start_port) + 1 > MAX_PORT_NUMBER) {
+    fprintf(stderr, "Invalide range for option ports: (Max range: %d)\n", MAX_PORT_NUMBER);
+    exit(2);
+  }
+
   data->ports_number = (end_port - start_port) + 1;
   for (size_t i = start_port; (short int)i <= end_port; i++)
     data->ports[i - start_port] = i;
@@ -59,7 +65,7 @@ static void set_ports_value_from_list(char *str, t_data *data) {
   char **split_data = ft_strsplit(str, ',', &len);
   if (split_data == NULL) {
     fprintf(stderr, "low memory can't store some data\n");
-    return;
+    exit(2);
   }
 
   nb_valid_ports = 0;
