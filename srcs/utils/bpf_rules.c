@@ -1,11 +1,10 @@
 #include "../../includes/ft_nmap.h"
 
 void compile_rule(pcap_t *p, char *rule, struct bpf_program *filter_program) {
-  if (pcap_compile(p, filter_program, rule, 1, PCAP_NETMASK_UNKNOWN) ==
-      PCAP_ERROR) {
+  if (pcap_compile(p, filter_program, rule, 1, PCAP_NETMASK_UNKNOWN) == PCAP_ERROR) {
     free(rule);
     fprintf(stderr, "Cant compile portrange rule %s, exiting program...\n",
-            pcap_geterr(p));
+    pcap_geterr(p));
     exit(0);
   }
   dprintf(1, "rule [%s] compiled \n", rule);

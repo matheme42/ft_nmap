@@ -17,12 +17,15 @@
 #include <netinet/if_ether.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 #include <netinet/udp.h>
 #include <pcap.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <string.h>
 #ifndef __USE_MISC
 #define __USE_MISC
 #endif
@@ -62,6 +65,21 @@ typedef struct packet {
     struct tcphdr tcphdr;
   };
 } t_packet;
+
+typedef struct mac_header {
+  char dest[6];
+  char src[6];
+  short type;
+} t_mac_header;
+
+typedef struct ethernet_trame {
+  t_mac_header machdr;
+  struct iphdr iphdr;
+  union {
+    struct udphdr udphdr;
+    struct tcphdr tcphdr;
+    struct icmphdr icmphdr;
+  };} __attribute__((packed)) t_trame;
 
 typedef struct s_scan {
   union {
@@ -175,6 +193,6 @@ bool parse_arguments(int ac, char **av, t_data *data);
 
 void send_packets(thread_data *data, int socket);
 void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip);
-void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header,
-                       const u_char *packet_body);
+void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body);
+void print_packet_info(t_trame *trame, struct pcap_pkthdr packet_header);
 #endif

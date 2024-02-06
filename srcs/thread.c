@@ -1,28 +1,7 @@
 #include "ft_nmap.h"
-#include <pthread.h>
-#include <string.h>
 
-void print_packet_info(const u_char *packet, struct pcap_pkthdr packet_header) {
-  dprintf(1, "we got %u bytes\n", packet_header.len);
-  for (int i = 0; i < packet_header.len; i++) {
-    if (i % 8 == 0 && i != 0)
-      dprintf(1, "\n");
-    dprintf(1, "%02hhx ", packet[i]);
-  }
-  dprintf(1, "\n\n");
-
-  packet = packet + 14;
-  t_packet *data = (t_packet *)packet;
-  printf("source port %u\n", ntohs(data->tcphdr.source));
-  printf("dest port %u\n", ntohs(data->tcphdr.dest));
-
-  // printf("source port %u\n", data->udphdr.source);
-  // printf("dest port %u\n", data->udphdr.dest);
-}
-
-void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header,
-                       const u_char *packet_body) {
-  print_packet_info(packet_body, *packet_header);
+void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body) {
+  print_packet_info((t_trame *)packet_body, *packet_header);
   return;
 }
 
