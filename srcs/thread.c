@@ -129,6 +129,7 @@ static void *thread_routine(void *ptr) {
   if (!(socket = create_socket(IPPROTO_TCP)) ||
       !(handle = pcap_open_live(data->device, BUFSIZ, 0, timeout_limit, error_buffer)))
     return (NULL);
+    set_filter(handle);
 
     for (int i = 0; i < 6; i++) {
       data->current_scan.mask = 0;
@@ -139,8 +140,6 @@ static void *thread_routine(void *ptr) {
       else if (i == 4) data->current_scan.type.udp = data->scan.type.udp;
       else if (i == 5) data->current_scan.type.xmas = data->scan.type.xmas;
       if (data->current_scan.mask == 0) continue;
-      clear_filter(handle);
-      //set_filter(handle);
       send_packets(data, socket);
       pcap_dispatch(handle, 0, my_packet_handler, ptr);
     }
