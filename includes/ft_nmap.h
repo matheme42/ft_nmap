@@ -100,7 +100,7 @@ typedef struct s_scan {
 typedef enum {S_FILTERED, S_CLOSED, S_OPEN} SYN_RESPONSE;
 typedef enum {A_FILTERED, A_UNFILTERED} ACK_RESPONSE;
 typedef enum {F_OPEN_FILTERED, F_CLOSED, F_FILTERED} FINNULLXMAS_RESPONSE;
-typedef enum {U_OPEN_FILTERED, U_CLOSED, U_FILTERED} UDP_RESPONSE;
+typedef enum {U_OPEN_FILTERED, U_OPEN, U_CLOSED, U_FILTERED} UDP_RESPONSE;
 
 typedef struct {
   char syn:2;

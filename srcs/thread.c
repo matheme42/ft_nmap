@@ -27,25 +27,45 @@ short get_port_id(short *ports, short port_number, const unsigned short port) {
   return -1;
 }
 
+// 0 --> UDP
+// 1 --> SYN/ACK
+// 2 --> RST
+// 3 --> ICMP code 3
+// 4 --> ICMP autre code
+// -1 --> error
 void analize_response(t_scan current_scan, char packet_type, t_response *response) {
   switch (current_scan.mask) {
     case 0b1: //SYN
-      /* code */
+      if (response->syn != 0) return ;
+      if (packet_type == 1) response->syn = S_OPEN;
+      else if (packet_type == 2) response->syn = S_CLOSED;
+      if (packet_type == 3 || packet_type == 4) response->syn = S_FILTERED;
       break;
     case 0b10: //NULL
-      /* code */
+      if (response->null != 0) return ;
+      if (packet_type == 2) response->null = F_CLOSED;
+      else if (packet_type == 3 || packet_type == 4) response->null = F_FILTERED;
       break;
     case 0b100: //ACK
-      /* code */
+      if (response->ack != 0) return ;
+      if (packet_type == 2) response->ack = A_UNFILTERED;
+      else if (packet_type == 3 || packet_type == 4) response->ack = A_FILTERED;
       break;
     case 0b1000: //FIN
-      /* code */
+      if (response->fin != 0) return ;
+      if (packet_type == 2) response->fin = F_CLOSED;
+      else if (packet_type == 3 || packet_type == 4) response->fin = F_FILTERED;
       break;
     case 0b10000: //XMAS
-      /* code */
+      if (response->xmas != 0) return ;
+      if (packet_type == 2) response->xmas = F_CLOSED;
+      else if (packet_type == 3 || packet_type == 4) response->xmas = F_FILTERED;
       break;
     case 0b100000: //UDP
-      /* code */
+      if (response->udp != 0) return ;
+      if (packet_type == 0) response->udp = U_OPEN;
+      else if (packet_type == 3) response->udp = U_CLOSED;
+      if (packet_type == 4) response->udp = U_FILTERED;
       break;
     default:
       break;
@@ -91,7 +111,6 @@ void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, co
   unsigned short port = get_packet_port(trame);
   short id = get_port_id(data->ports, data->nb_port, port);
   if (id < 0) return ;
- // dprintf(1, "%d\n", id);
   char response_type = simplifize_response(trame);
   analize_response(data->current_scan, response_type, &(data->response[id]));
   print_packet_info(trame, *packet_header);
