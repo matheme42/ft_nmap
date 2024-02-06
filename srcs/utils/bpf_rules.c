@@ -7,7 +7,7 @@ void compile_rule(pcap_t *p, char *rule, struct bpf_program *filter_program) {
     pcap_geterr(p));
     exit(0);
   }
-  dprintf(1, "rule [%s] compiled \n", rule);
+//  dprintf(1, "rule [%s] compiled \n", rule);
   free(rule);
 }
 

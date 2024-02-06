@@ -30,24 +30,16 @@ void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desi
   pthread_t thread[MAX_SPEEDUP];
   thread_data thread_data[MAX_SPEEDUP];
 
-  int threadPortRange = data->ports_number / data->speedup;
+  float threadPortRange = data->ports_number / (float)data->speedup;
   for (int n = 0; n < data->speedup; n++) {
     thread_data[n].device = device;
     thread_data[n].pubip = pubip;
     thread_data[n].destip = desip;
     thread_data[n].scan = data->scanmask;
 
-    // set port number
-    if (n == data->speedup - 1 && data->speedup > 1) {
-      thread_data[n].nb_port = data->ports_number - (threadPortRange * data->speedup);
-    } else {
-      thread_data[n].nb_port = threadPortRange;
-    }
-
     // fill port range
-    memcpy(thread_data[n].ports, &data->ports[n * threadPortRange], thread_data[n].nb_port * sizeof(short));
-    
-
+    thread_data[n].nb_port = (int)(threadPortRange * (n + 1)) - (int)(threadPortRange * n);
+    memcpy(thread_data[n].ports, &data->ports[(int)(n * threadPortRange)], thread_data[n].nb_port * sizeof(short));
 
     pthread_create(&thread[n], NULL, &thread_routine, &thread_data[n]);
   }
