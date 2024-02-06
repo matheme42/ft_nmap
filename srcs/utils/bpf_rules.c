@@ -35,7 +35,7 @@ void compile_host_rule(
   compile_rule(p, filter_rule, filter_program);
 }
 
-void set_filter(pcap_t *p) {
+void old_set_filter(pcap_t *p) {
   struct bpf_program filter_program;
   // const char *str = "greater 200";
 
