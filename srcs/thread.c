@@ -124,12 +124,13 @@ static void *thread_routine(void *ptr) {
   int         timeout_limit = 300; /* In milliseconds */
   int         socket;
   thread_data *data = ptr;
-  int udp_socket = create_socket(IPPROTO_ICMP);
+//  int udp_socket = create_socket(IPPROTO_ICMP);
 
-  if (!(socket = create_socket(IPPROTO_TCP)) ||
+  if (data->nb_port <= 0 ||
+      !(socket = create_socket(IPPROTO_TCP)) ||
       !(handle = pcap_open_live(data->device, BUFSIZ, 0, timeout_limit, error_buffer)))
     return (NULL);
-    set_filter(handle);
+    set_filter(handle, data);
 
     for (int i = 0; i < 6; i++) {
       data->current_scan.mask = 0;

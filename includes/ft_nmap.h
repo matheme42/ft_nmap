@@ -164,7 +164,7 @@ unsigned short checksum(void *b, int len);
 
 /* PCAP RULES */
 
-void set_filter(pcap_t *p);
+void set_filter(pcap_t *p, thread_data *data);
 void compile_host_rule(pcap_t *p, char *host,
                        struct bpf_program *filter_program, char *host_family);
 void compile_portrange_rule(pcap_t *p, int port_min, int port_max,
