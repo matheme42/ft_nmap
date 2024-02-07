@@ -124,7 +124,7 @@ typedef struct {
 } thread_data;
 
 typedef struct s_data {
-  short ports[1024]; // ports need to be scan store as a list
+  u_int16_t ports[1024]; // ports need to be scan store as a list
   short ports_number;
   char **ip_address; // the list of ip address that need to be scan
   short speedup;     // default 0, max 250

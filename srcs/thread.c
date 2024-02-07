@@ -20,10 +20,9 @@ int get_packet_port(t_trame *trame) {
   }
 }
 
-short get_port_id(short *ports, short port_number, const unsigned short port) {
-  for (int i = 0; i < port_number; i++) {
+short get_port_id(u_int16_t *ports, short port_number, u_int16_t port) {
+  for (int i = 0; i < port_number; i++)
     if (ports[i] == port) return i;
-  }
   return -1;
 }
 
@@ -127,23 +126,24 @@ static void *thread_routine(void *ptr) {
 //  int udp_socket = create_socket(IPPROTO_ICMP);
 
   if (data->nb_port <= 0 ||
-      !(socket = create_socket(IPPROTO_TCP)) ||
-      !(handle = pcap_open_live(data->device, BUFSIZ, 0, timeout_limit, error_buffer)))
+    !(socket = create_socket(IPPROTO_TCP)) ||
+    !(handle = pcap_open_live(data->device, BUFSIZ, 0, timeout_limit, error_buffer))) {
     return (NULL);
-    set_filter(handle, data);
+  }
+  set_filter(handle, data);
 
-    for (int i = 0; i < 6; i++) {
-      data->current_scan.mask = 0;
-      if (i == 0) data->current_scan.type.ack = data->scan.type.ack;
-      else if (i == 1) data->current_scan.type.fin = data->scan.type.fin;
-      else if (i == 2) data->current_scan.type.null = data->scan.type.null;
-      else if (i == 3) data->current_scan.type.syn = data->scan.type.syn;
-      else if (i == 4) data->current_scan.type.udp = data->scan.type.udp;
-      else if (i == 5) data->current_scan.type.xmas = data->scan.type.xmas;
-      if (data->current_scan.mask == 0) continue;
-      send_packets(data, socket);
-      pcap_dispatch(handle, 0, my_packet_handler, ptr);
-    }
+  for (int i = 0; i < 6; i++) {
+    data->current_scan.mask = 0;
+    if (i == 0) data->current_scan.type.ack = data->scan.type.ack;
+    else if (i == 1) data->current_scan.type.fin = data->scan.type.fin;
+    else if (i == 2) data->current_scan.type.null = data->scan.type.null;
+    else if (i == 3) data->current_scan.type.syn = data->scan.type.syn;
+    else if (i == 4) data->current_scan.type.udp = data->scan.type.udp;
+    else if (i == 5) data->current_scan.type.xmas = data->scan.type.xmas;
+    if (data->current_scan.mask == 0) continue;
+    send_packets(data, socket);
+    pcap_dispatch(handle, 0, my_packet_handler, ptr);
+  }
 
   pcap_close(handle);
   close(socket);
