@@ -114,7 +114,7 @@ void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, co
   char response_type = simplifize_response(trame);
   if (response_type < 0) return ;
   analize_response(data->current_scan, response_type, &(data->response[id]));
-  print_packet_info(trame, *packet_header);
+ // print_packet_info(trame, *packet_header);
   return;
 }
 
