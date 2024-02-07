@@ -104,12 +104,19 @@ typedef enum {F_OPEN_FILTERED, F_CLOSED, F_FILTERED} FINNULLXMAS_RESPONSE;
 typedef enum {U_OPEN_FILTERED, U_OPEN, U_CLOSED, U_FILTERED} UDP_RESPONSE;
 
 typedef struct {
-  u_char syn:2;
-  u_char ack:1;
-  u_char fin:2;
-  u_char null:2;
-  u_char xmas:2;
-  u_char udp:2;
+  union 
+  {
+    struct {
+      u_char syn:2;
+      u_char ack:1;
+      u_char fin:2;
+      u_char null:2;
+      u_char xmas:2;
+      u_char udp:2;
+    };
+    short value;
+  };
+
 } t_response;
 
 typedef struct {
