@@ -133,14 +133,11 @@ typedef struct s_data {
 
 // ******************* UTILS SECTIONS ******************* //
 
-char *ft_itoa(int n);
-char *ft_strjoin(char const *s1, char const *s2);
 int ft_atoi(const char *str);
 void ft_bzero(void *s, size_t n);
 char **ft_strsplit(const char *s, char c, int *len);
 char *ft_strsub(char const *s, unsigned int start, size_t len);
 void *ft_malloc(size_t size);
-void *ft_memset(void *b, int c, size_t len);
 char *ft_trim(char *s);
 char *ft_strchr(const char *s, int c);
 int ft_strlen(const char *str);
@@ -167,11 +164,6 @@ unsigned short checksum(void *b, int len);
 /* PCAP RULES */
 
 void set_filter(pcap_t *p, thread_data *data);
-void compile_host_rule(pcap_t *p, char *host,
-                       struct bpf_program *filter_program, char *host_family);
-void compile_portrange_rule(pcap_t *p, int port_min, int port_max,
-                            struct bpf_program *filter_program,
-                            char *port_family);
 
 // ****************** PARSING SECTIONS ****************** //
 
@@ -216,6 +208,5 @@ void send_packets(thread_data *data, int socket);
 void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip);
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body);
 void print_packet_info(t_trame *trame, struct pcap_pkthdr packet_header);
-void clear_filter(pcap_t *p);
 void display_response(thread_data thread_data[MAX_SPEEDUP], int speedup);
 #endif
