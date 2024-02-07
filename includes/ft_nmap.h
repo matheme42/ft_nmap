@@ -217,4 +217,5 @@ void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desi
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body);
 void print_packet_info(t_trame *trame, struct pcap_pkthdr packet_header);
 void clear_filter(pcap_t *p);
+void display_response(thread_data thread_data[MAX_SPEEDUP], int speedup);
 #endif
