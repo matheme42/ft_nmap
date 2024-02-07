@@ -105,10 +105,8 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  int i = -1;
   while (*data.ip_address) {
     dprintf(1, "\nscanning: %s\n", *data.ip_address);
-
 
     pubip = get_public_ip(*data.ip_address);
     if (!pubip) continue ;

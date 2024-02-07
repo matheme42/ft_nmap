@@ -14,7 +14,6 @@ static void create_udp_packet(t_packet *pkt, struct sockaddr *src,
 }
 
 static void create_tcp_packet(t_scan scan, struct sockaddr *src, struct sockaddr *dst, t_packet *pkt) {
-  t_scan    flag;
   uint16_t  dest_port;
   uint16_t  src_port;
   uint32_t  dest_addr;
