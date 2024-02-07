@@ -6,7 +6,7 @@ static void send_dummy_bytes(int sockFd, struct sockaddr *addr, const char *host
   t_packet dummy_packet;
 
   ft_bzero(&dummy_packet, sizeof(t_packet));
-  lookup_host(host, &addr);
+  lookup_host(host, addr);
   ((struct sockaddr_in *)addr)->sin_family = AF_INET;
   ((struct sockaddr_in *)addr)->sin_port = htons(33434);
   fill_ICMP_Header(&dummy_packet);

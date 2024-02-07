@@ -142,6 +142,7 @@ char *ft_trim(char *s);
 char *ft_strchr(const char *s, int c);
 int ft_strlen(const char *str);
 char *ft_strcpy(char *dest, const char *str);
+void *ft_memcpy(void *dest, const void *str, size_t size);
 int ft_strcmp(const char *s1, const char *s2);
 void free_tab(char **x);
 
@@ -158,7 +159,7 @@ void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, uint16_t src_port,
 void fill_SHTCP_Header(struct shtcp *header, uint32_t daddr, uint32_t saddr);
 void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t protocol);
 
-void lookup_host(const char *host, struct sockaddr **sockaddr);
+void lookup_host(const char *host, struct sockaddr *sockaddr);
 unsigned short checksum(void *b, int len);
 
 /* PCAP RULES */

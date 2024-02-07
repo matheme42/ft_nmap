@@ -71,7 +71,7 @@ void fill_SHTCP_Header(struct shtcp *header, uint32_t daddr, uint32_t saddr) {
   header->tcp_len = htons(sizeof(struct tcphdr));
 }
 
-void lookup_host(const char *host, struct sockaddr **sockaddr) {
+void lookup_host(const char *host, struct sockaddr *sockaddr) {
   struct addrinfo hints;
   struct addrinfo *res;
 
@@ -83,6 +83,7 @@ void lookup_host(const char *host, struct sockaddr **sockaddr) {
   hints.ai_flags = AI_CANONNAME;
 
   if (!getaddrinfo(host, NULL, &hints, &res)) {
-    *sockaddr = res->ai_addr;
+    *sockaddr = *res->ai_addr;
+    freeaddrinfo(res);
   }
 }

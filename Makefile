@@ -39,7 +39,7 @@ OBJ_NAME_PARSING= $(NAME_SRC_PARSING:.c=.o)
 
 OBJS = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME)) $(addprefix $(OBJ_PATH)/utils/,$(OBJ_NAME_UTILS)) $(addprefix $(OBJ_PATH)/parsing/,$(OBJ_NAME_PARSING))
 
-DEBUG_FLAG =  -g3 #-Wall -Wextra -fsanitize=address
+DEBUG_FLAG =  -g3 #-Wall -Wextra #-fsanitize=address
 
 
 

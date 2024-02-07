@@ -126,11 +126,8 @@ static void *thread_routine(void *ptr) {
 //  int udp_socket = create_socket(IPPROTO_ICMP);
 
   if (data->nb_port <= 0 ||
-    !(socket = create_socket(IPPROTO_TCP)) ||
-    !(handle = pcap_open_live(data->device, BUFSIZ, 0, timeout_limit, error_buffer))) {
+    !(socket = create_socket(IPPROTO_TCP)))
     return (NULL);
-  }
-  set_filter(handle, data);
 
   for (int i = 0; i < 6; i++) {
     data->current_scan.mask = 0;
@@ -141,11 +138,13 @@ static void *thread_routine(void *ptr) {
     else if (i == 4) data->current_scan.type.udp = data->scan.type.udp;
     else if (i == 5) data->current_scan.type.xmas = data->scan.type.xmas;
     if (data->current_scan.mask == 0) continue;
+    if (!(handle = pcap_open_live(data->device, BUFSIZ, -1, timeout_limit, error_buffer)))
+      continue;
+    set_filter(handle, data);
     send_packets(data, socket);
     pcap_dispatch(handle, 0, my_packet_handler, ptr);
+    pcap_close(handle);
   }
-
-  pcap_close(handle);
   close(socket);
   return NULL;
 }
@@ -164,7 +163,7 @@ void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desi
     thread_data[n].scan = data->scanmask;
     // fill port range
     thread_data[n].nb_port = (int)(threadPortRange * (n + 1)) - (int)(threadPortRange * n);
-    memcpy(thread_data[n].ports, &data->ports[(int)(n * threadPortRange)], thread_data[n].nb_port * sizeof(short));
+    ft_memcpy(thread_data[n].ports, &data->ports[(int)(n * threadPortRange)], thread_data[n].nb_port * sizeof(short));
     pthread_create(&thread[n], NULL, &thread_routine, &thread_data[n]);
   }
 

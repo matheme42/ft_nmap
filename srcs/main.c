@@ -55,11 +55,9 @@ void print_devs(pcap_if_t *alldevsp) {
 
 u_int32_t htoi(char *host) {
   struct sockaddr dest;
-  struct sockaddr *destPoiteur = &dest;
 
-  lookup_host(host, &destPoiteur);
-
-  return ((struct sockaddr_in*)destPoiteur)->sin_addr.s_addr;
+  lookup_host(host, &dest);
+  return ((struct sockaddr_in*)&dest)->sin_addr.s_addr;
 }
 
 void		ft_quicksort(uint16_t *tab, int len)
@@ -94,6 +92,7 @@ int main(int argc, char **argv) {
   pcap_if_t *alldevsp;
   u_int32_t pubip;
   char      *dev;
+  int       n;
 
   if (!parse_arguments(argc, argv, &data)) return (1);
   print_data(&data);
@@ -102,19 +101,21 @@ int main(int argc, char **argv) {
   ft_bzero(error_buffer, PCAP_ERRBUF_SIZE);
   if (pcap_findalldevs(&alldevsp, error_buffer)) {
     fprintf(stderr, "Error finding devs: %s\n", error_buffer);
+    free_tab(data.ip_address);
     return 1;
   }
 
-  while (*data.ip_address) {
-    dprintf(1, "\nscanning: %s\n", *data.ip_address);
+  n = 0;
+  while (data.ip_address[n]) {
+    dprintf(1, "\nscanning: %s\n", data.ip_address[n]);
 
-    pubip = get_public_ip(*data.ip_address);
+    pubip = get_public_ip(data.ip_address[n]);
     if (!pubip) continue ;
     if (!(dev = get_devname_by_ip(alldevsp, pubip))) continue;
-    dispatch_thread(&data, dev, pubip, htoi(*data.ip_address));
-    data.ip_address++;
+    dispatch_thread(&data, dev, pubip, htoi(data.ip_address[n]));
+    n++;
   }
-  
+  free_tab(data.ip_address);
   pcap_freealldevs(alldevsp);
   return 0;
 }
