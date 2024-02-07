@@ -105,7 +105,7 @@ char simplifize_response(t_trame *trame) {
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body) {
   t_trame *trame = (t_trame *)packet_body;
   thread_data *data = (thread_data *)args;
-  if ((data->destip == trame->iphdr.daddr && data->destip != 16777343) && trame->iphdr.id != getuid()) return ;
+  if ((data->destip == trame->iphdr.daddr && data->destip != 16777343) && trame->iphdr.id != 154) return ;
   
   unsigned short port = get_packet_port(trame);
   short id = get_port_id(data->ports, data->nb_port, port);

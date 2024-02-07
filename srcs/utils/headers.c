@@ -54,7 +54,7 @@ void fill_IP_Header(struct iphdr *header, uint32_t daddr, u_int8_t protocol) {
   header->ihl = 5;
   header->tos = 0;
   header->tot_len = 0;
-  header->id = getuid();
+  header->id = 154;
   header->frag_off = 0;
   header->ttl = 255;
   header->protocol = protocol;
