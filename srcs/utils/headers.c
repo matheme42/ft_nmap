@@ -1,9 +1,18 @@
 #include "../../includes/ft_nmap.h"
 
+void fill_ICMP_Header(struct packet *pkt) {
+    pkt->icmphdr.type = ICMP_ECHO;
+    pkt->icmphdr.code = 0;
+    pkt->icmphdr.checksum = 0;
+    pkt->icmphdr.un.echo.id = 0;
+    pkt->icmphdr.un.echo.sequence = 0;
+    pkt->icmphdr.checksum = checksum(&pkt->icmphdr, sizeof(struct icmphdr));
+}
+
 void fill_UDP_Header(struct udphdr *udphdr, uint16_t sport, uint16_t dport) {
   udphdr->source = htons(sport);
   udphdr->dest = htons(dport);
-  udphdr->len = htons(sizeof(struct packet) - sizeof(struct iphdr));
+  udphdr->len = htons(sizeof(struct udphdr));
   udphdr->check = 0;
 }
 
@@ -35,7 +44,7 @@ void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, uint16_t  src_port, ui
   tcphdr->urg = flags.type.xmas;
   tcphdr->psh = flags.type.xmas;
   tcphdr->res1 = 0;
-  tcphdr->window = 65535;
+  tcphdr->window = USHRT_MAX;
   tcphdr->urg_ptr = 0;
 }
 

@@ -20,6 +20,7 @@ static void create_tcp_packet(t_scan scan, struct sockaddr *src, struct sockaddr
   uint32_t  dest_addr;
   uint32_t  src_addr;
 
+
   dest_port = (uint16_t)((struct sockaddr_in *)dst)->sin_port;
   src_port = (uint16_t)((struct sockaddr_in *)src)->sin_port;
   dest_addr = (uint32_t)((struct sockaddr_in *)dst)->sin_addr.s_addr;
@@ -44,12 +45,16 @@ void send_packets(thread_data *data, int socket) {
     struct sockaddr dest_addr;
     t_packet        packet;
 
+    ft_bzero(&src_addr, sizeof(struct sockaddr));
+    ft_bzero(&dest_addr, sizeof(struct sockaddr));
     for (short port_idx = 0; port_idx < data->nb_port; port_idx++) {
       ((struct sockaddr_in *)&src_addr)->sin_addr.s_addr = data->pubip;
       ((struct sockaddr_in *)&src_addr)->sin_port = 34443 + port_idx;  
+      ((struct sockaddr_in *)&src_addr)->sin_family = AF_INET;
       ((struct sockaddr_in *)&dest_addr)->sin_addr.s_addr = data->destip;
       ((struct sockaddr_in *)&dest_addr)->sin_port = data->ports[port_idx];
+      ((struct sockaddr_in *)&dest_addr)->sin_family = AF_INET;
       create_scan_packet(data->current_scan, &src_addr, &dest_addr, &packet);
-      sendto(socket, &packet, sizeof(struct packet), 0, ((struct sockaddr *)&dest_addr), sizeof(struct sockaddr_in));
+     sendto(socket, &packet, sizeof(struct packet), 0, ((struct sockaddr *)&dest_addr), sizeof(struct sockaddr_in));
     }
 }

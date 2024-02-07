@@ -111,6 +111,7 @@ int main(int argc, char **argv) {
 
 
     pubip = get_public_ip(*data.ip_address);
+    if (!pubip) continue ;
     if (!(dev = get_devname_by_ip(alldevsp, pubip))) continue;
     dispatch_thread(&data, dev, pubip, htoi(*data.ip_address));
     data.ip_address++;

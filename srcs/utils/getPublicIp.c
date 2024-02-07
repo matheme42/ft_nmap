@@ -9,8 +9,8 @@ static void send_dummy_bytes(int sockFd, struct sockaddr *addr, const char *host
   lookup_host(host, &addr);
   ((struct sockaddr_in *)addr)->sin_family = AF_INET;
   ((struct sockaddr_in *)addr)->sin_port = htons(33434);
-  fill_UDP_Header(&dummy_packet.udphdr, 33434, 443);
-  fill_IP_Header(&dummy_packet.iphdr, (uint32_t)((struct sockaddr_in *)addr)->sin_addr.s_addr, IPPROTO_UDP);
+  fill_ICMP_Header(&dummy_packet);
+  fill_IP_Header(&dummy_packet.iphdr, (uint32_t)((struct sockaddr_in *)addr)->sin_addr.s_addr, IPPROTO_ICMP);
   sendto(sockFd, &dummy_packet, sizeof(struct packet), 0, (struct sockaddr *)addr, sizeof(struct sockaddr_in));
 }
 
@@ -30,8 +30,8 @@ u_int32_t recieve_data(int sockFd, struct sockaddr *addr) {
   messageHdr.msg_iov = &retMsgData;
 
   socklen_t addrlen = sizeof(struct sockaddr);
-  recvfrom(sockFd, &recieve, sizeof(recieve), 0, addr, &addrlen);
-
+  int ret = recvfrom(sockFd, &recieve, sizeof(recieve), 0, addr, &addrlen);
+  if (ret <= 0) return 0;
   return recieve.iphdr.daddr;
 }
 
@@ -40,7 +40,7 @@ u_int32_t get_public_ip(const char *host) {
   struct sockaddr addr;
   u_int32_t publicIp;
 
-  sockFd = create_socket(IPPROTO_UDP);
+  sockFd = create_socket(IPPROTO_ICMP);
   send_dummy_bytes(sockFd, &addr, host);
   publicIp = recieve_data(sockFd, &addr);
   close(sockFd);

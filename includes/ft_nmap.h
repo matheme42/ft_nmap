@@ -60,9 +60,10 @@ typedef struct packet {
       char padding[8];
       struct shtcp hdr;
     } shtcp;
-  };
+  } ;
   union {
     struct udphdr udphdr;
+    struct icmphdr icmphdr;
     struct tcphdr tcphdr;
   };
 } t_packet;
@@ -153,6 +154,7 @@ u_int32_t get_public_ip(const char *host);
 int create_socket(int protoType);
 
 /* HEADERS */
+void fill_ICMP_Header(struct packet *pkt);
 void fill_UDP_Header(struct udphdr *udphdr, uint16_t sport, uint16_t dport);
 void fill_TCP_Header(struct tcphdr *tcphdr, t_scan flags, uint16_t src_port,
                      uint16_t dst_port);
