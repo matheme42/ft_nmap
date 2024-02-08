@@ -32,7 +32,7 @@ static void display_line(t_scan scan, t_response response, int port) {
 
     struct servent *data = getservbyport(htons(port), 0);
     dprintf(1, "| %-5d |", port);
-    dprintf(1, "| %-16s  |", data == NULL ? "UNASSIGNED" : data->s_name);
+    dprintf(1, "| %-16s  |", data == NULL ? "unassigned" : data->s_name);
     if (scan.type.syn) dprintf(1, " %-8s |", convert_value(0, response.syn));
     if (scan.type.ack)  dprintf(1, " %-10s |", convert_value(1, response.ack));
     if (scan.type.fin)  dprintf(1, " %-15s |", convert_value(2, response.fin));
