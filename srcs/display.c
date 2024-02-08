@@ -15,7 +15,7 @@ char *convert_value(char scan, unsigned char v) {
 
 static void display_header(t_scan scan) {
     dprintf(1, "| PORT  |");
-    dprintf(1, "| SERVICE     |");
+    dprintf(1, "| SERVICE           |");
     if (scan.type.syn)  dprintf(1, " SYN      |");
     if (scan.type.ack)  dprintf(1, " ACK        |");
     if (scan.type.fin)  dprintf(1, " FIN             |");
