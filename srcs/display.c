@@ -15,6 +15,7 @@ char *convert_value(char scan, unsigned char v) {
 
 static void display_header(t_scan scan) {
     dprintf(1, "| PORT  |");
+    dprintf(1, "| SERVICE     |");
     if (scan.type.syn)  dprintf(1, " SYN      |");
     if (scan.type.ack)  dprintf(1, " ACK        |");
     if (scan.type.fin)  dprintf(1, " FIN             |");
@@ -29,7 +30,9 @@ static void display_line(t_scan scan, t_response response, int port) {
 
     if (line++ == 0)  display_header(scan);
 
+    struct servent *data = getservbyport(htons(port), 0);
     dprintf(1, "| %-5d |", port);
+    dprintf(1, "| %-11s  |", data == NULL ? "UNASSIGNED" : data->s_name);
     if (scan.type.syn) dprintf(1, " %-8s |", convert_value(0, response.syn));
     if (scan.type.ack)  dprintf(1, " %-10s |", convert_value(1, response.ack));
     if (scan.type.fin)  dprintf(1, " %-15s |", convert_value(2, response.fin));

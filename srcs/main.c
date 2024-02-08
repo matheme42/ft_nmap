@@ -101,6 +101,15 @@ void run_routine(t_data *data, char *device, u_int32_t pubip, u_int32_t destip) 
 }
 
 
+static void display_time(struct timeval *start, char*host) {
+  struct timeval end;
+  gettimeofday(&end, NULL);
+  long sec = end.tv_sec - start->tv_sec;
+  long ms = end.tv_usec - start->tv_usec;
+  long total_time = (sec * 1000000) + ms;
+  dprintf(1, "scanning: %s in %ld.%lds\n", host, total_time / 1000000, (total_time % 1000000) / 1000);
+}
+
 
 int main(int argc, char **argv) {
   t_data data;
@@ -122,8 +131,10 @@ int main(int argc, char **argv) {
   }
 
   n = 0;
+  struct timeval start_time;
   while (data.ip_address[n]) {
     dprintf(1, "\nscanning: %s\n", data.ip_address[n]);
+    gettimeofday(&start_time, NULL);
 
     pubip = get_public_ip(data.ip_address[n]);
     if (!pubip) continue ;
@@ -133,6 +144,7 @@ int main(int argc, char **argv) {
       dispatch_thread(&data, dev, pubip, destAddr);
     else
       run_routine(&data, dev, pubip, destAddr);
+    display_time(&start_time, data.ip_address[n]);
     n++;
   }
   free_tab(data.ip_address);
