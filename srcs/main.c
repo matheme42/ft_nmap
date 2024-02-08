@@ -130,9 +130,9 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  n = 0;
+  n = -1;
   struct timeval start_time;
-  while (data.ip_address[n]) {
+  while (data.ip_address[++n]) {
     dprintf(1, "\nscanning: %s\n", data.ip_address[n]);
     gettimeofday(&start_time, NULL);
 
@@ -145,7 +145,6 @@ int main(int argc, char **argv) {
     else
       run_routine(&data, dev, pubip, destAddr);
     display_time(&start_time, data.ip_address[n]);
-    n++;
   }
   free_tab(data.ip_address);
   pcap_freealldevs(alldevsp);

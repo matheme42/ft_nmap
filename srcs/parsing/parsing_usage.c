@@ -10,4 +10,5 @@ void show_help() {
   fprintf(stderr, "--file     File name containing IP addresses to scan\n");
   fprintf(stderr, "--speedup  [250 max] number of parallel threads to use\n");
   fprintf(stderr, "--scan     SYN / NULL / FIN / XMAS / ACK / UDP\n");
+  fprintf(stderr, "--all      display all scanning result\n");
 }
