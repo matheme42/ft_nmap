@@ -176,7 +176,7 @@ void set_filter(pcap_t *p, thread_data *data);
 // ****************** PARSING SECTIONS ****************** //
 
 // option --speedup
-#define MIN_SPEEDUP 1
+#define MIN_SPEEDUP 0
 #define MAX_SPEEDUP 250
 void set_speedup_value(char *value, t_data *data);
 
@@ -213,6 +213,7 @@ bool parse_arguments(int ac, char **av, t_data *data);
 // ****************** OTHERS SECTIONS ****************** //
 
 void send_packets(thread_data *data, int socket);
+void *thread_routine(void *ptr);
 void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip);
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body);
 void print_packet_info(t_trame *trame, struct pcap_pkthdr packet_header);

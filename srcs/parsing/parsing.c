@@ -53,7 +53,6 @@ static bool check_parsed_arguments(t_data *data) {
   if (data->ip_address == NULL) return false;
   if (data->ports_number == 0) set_ports_value("1-1024", data);
   if (data->scanmask.mask == 0) data->scanmask.mask = 255;
-  if (data->speedup == 0) data->speedup = 1;
   return true;
 }
 

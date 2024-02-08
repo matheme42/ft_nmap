@@ -85,6 +85,22 @@ void		ft_quicksort(uint16_t *tab, int len)
 	ft_quicksort(&tab[m], len - m);
 }
 
+void run_routine(t_data *data, char *device, u_int32_t pubip, u_int32_t destip) {
+  thread_data routine_data;
+
+  printf("running routine\n");
+  ft_bzero(&routine_data, sizeof(thread_data));
+  routine_data.device = device;
+  routine_data.pubip = pubip;
+  routine_data.destip = destip;
+  routine_data.scan = data->scanmask;
+  routine_data.nb_port = data->ports_number;
+  ft_memcpy(routine_data.ports, data->ports, routine_data.nb_port * sizeof(u_int16_t));
+  thread_routine(&routine_data);
+  display_response(&routine_data, 1);
+}
+
+
 
 int main(int argc, char **argv) {
   t_data data;
@@ -112,7 +128,11 @@ int main(int argc, char **argv) {
     pubip = get_public_ip(data.ip_address[n]);
     if (!pubip) continue ;
     if (!(dev = get_devname_by_ip(alldevsp, pubip))) continue;
-    dispatch_thread(&data, dev, pubip, htoi(data.ip_address[n]));
+    uint32_t destAddr = htoi(data.ip_address[n]);
+    if (data.speedup)
+      dispatch_thread(&data, dev, pubip, destAddr);
+    else
+      run_routine(&data, dev, pubip, destAddr);
     n++;
   }
   free_tab(data.ip_address);

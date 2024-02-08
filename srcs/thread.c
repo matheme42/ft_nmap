@@ -117,7 +117,7 @@ void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, co
   return;
 }
 
-static void *thread_routine(void *ptr) {
+void *thread_routine(void *ptr) {
   char        error_buffer[PCAP_ERRBUF_SIZE];
   pcap_t      *handle;
   int         timeout_limit = 300; /* In milliseconds */
