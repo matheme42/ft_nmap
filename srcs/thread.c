@@ -170,5 +170,5 @@ void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desi
   for (int n = 0; n < data->speedup; n++)
     pthread_join(thread[n], NULL);
 
-  display_response(thread_data, data->speedup);
+  display_response(thread_data, data->speedup, data->display_all);
 }

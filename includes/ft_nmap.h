@@ -40,10 +40,10 @@ typedef int bool; // définition du type booléen,
 
 #define USAGE                                                                  \
   "> ft_nmap [--help] [--ports[NUMBER/RANGED]] --ip   IP_ADDRESS "             \
-  "[--speedup[NUMBER]] [--scan [TYPE]]"
+  "[--speedup[NUMBER]] [--scan [TYPE]] [--all]"
 #define USAGE_FILE                                                             \
   "          [--help] [--ports[NUMBER/RANGED]] --file FILE       "             \
-  "[--speedup[NUMBER]] [--scan [TYPE]]"
+  "[--speedup[NUMBER]] [--scan [TYPE]] [--all]"
 
 struct shtcp {
   unsigned int src;
@@ -134,6 +134,7 @@ typedef struct s_data {
   u_int16_t ports[1024]; // ports need to be scan store as a list
   short ports_number;
   char **ip_address; // the list of ip address that need to be scan
+  bool display_all;
   short speedup;     // default 0, max 250
   t_scan scanmask;   // SYN, NULL, ACK, FIN, XMAS, UDP
 } t_data;
@@ -217,5 +218,5 @@ void *thread_routine(void *ptr);
 void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip);
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body);
 void print_packet_info(t_trame *trame, struct pcap_pkthdr packet_header);
-void display_response(thread_data thread_data[MAX_SPEEDUP], int speedup);
+void display_response(thread_data thread_data[MAX_SPEEDUP], int speedup, bool all);
 #endif

@@ -42,8 +42,11 @@ static bool manage_argument(char *option, char *value, t_data *data) {
     }
     data->ip_address = parse_file(value);
     break;
+  case 193486302: // all
+      data->display_all = true;
+    break;
   default:
-    dprintf(2, "\e[1;31mUnknown option %s\e[1;0m\n", option);
+      dprintf(2, "\e[1;31mUnknown option %s(%d)\e[1;0m\n", option, hash(option));
     break;
   }
   return true;
