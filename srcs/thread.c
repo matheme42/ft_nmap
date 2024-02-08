@@ -123,12 +123,12 @@ void *thread_routine(void *ptr) {
   int         timeout_limit = 300; /* In milliseconds */
   int         socket;
   thread_data *data = ptr;
-//  int udp_socket = create_socket(IPPROTO_ICMP);
 
   if (data->nb_port <= 0 ||
-    !(socket = create_socket(IPPROTO_TCP)))
+    !(socket = create_socket(IPPROTO_TCP)) ||
+    !(handle = pcap_open_live(data->device, BUFSIZ, -1, timeout_limit, error_buffer)))
     return (NULL);
-
+  set_filter(handle, data);
   for (int i = 0; i < 6; i++) {
     data->current_scan.mask = 0;
     if (i == 0) data->current_scan.type.ack = data->scan.type.ack;
@@ -138,13 +138,12 @@ void *thread_routine(void *ptr) {
     else if (i == 4) data->current_scan.type.udp = data->scan.type.udp;
     else if (i == 5) data->current_scan.type.xmas = data->scan.type.xmas;
     if (data->current_scan.mask == 0) continue;
-    if (!(handle = pcap_open_live(data->device, BUFSIZ, -1, timeout_limit, error_buffer)))
-      continue;
-    set_filter(handle, data);
     send_packets(data, socket);
-    pcap_dispatch(handle, 0, my_packet_handler, ptr);
-    pcap_close(handle);
+    int ret = pcap_dispatch(handle, 0, my_packet_handler, ptr);
+    if (ret < data->nb_port && data->destip == 16777343)
+      pcap_dispatch(handle, 0, my_packet_handler, ptr);
   }
+  pcap_close(handle);
   close(socket);
   return NULL;
 }
