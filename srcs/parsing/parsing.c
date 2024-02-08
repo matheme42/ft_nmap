@@ -9,10 +9,10 @@ static unsigned long hash(const char *str) {
   return hash;
 }
 
-static bool manage_argument(char *option, char *value, t_data *data) {
+static int manage_argument(char *option, char *value, t_data *data) {
   switch (hash(option)) {
   case 6385292014: // help
-    return false;
+    return 1;
   case 210724489981: // ports
     if (data->ports_number != 0) {
       fprintf(stderr, "ports are already reffered\n option %s ignored", option);
@@ -44,12 +44,13 @@ static bool manage_argument(char *option, char *value, t_data *data) {
     break;
   case 193486302: // all
       data->display_all = true;
+      return 2;
     break;
   default:
       dprintf(2, "\e[1;31mUnknown option %s\e[1;0m\n", option);
     break;
   }
-  return true;
+  return 0;
 }
 
 static bool check_parsed_arguments(t_data *data) {
@@ -61,12 +62,14 @@ static bool check_parsed_arguments(t_data *data) {
 
 bool parse_arguments(int ac, char **av, t_data *data) {
   bool skip;
+  int ret;
 
   skip = false;
   ft_bzero(data, sizeof(t_data));
   for (int idx = 1; idx < ac; idx++) {
     if (!skip && av[idx][0] == '-' && av[idx][1] == '-') {
-      if (!manage_argument(&(av[idx][2]), av[idx + 1], data)) {
+      if ((ret = manage_argument(&(av[idx][2]), av[idx + 1], data))) {
+        if (ret == 2) continue ;
         free_tab(data->ip_address);
         show_help();
         return false;
