@@ -97,7 +97,7 @@ void run_routine(t_data *data, char *device, u_int32_t pubip, u_int32_t destip) 
   routine_data.nb_port = data->ports_number;
   ft_memcpy(routine_data.ports, data->ports, routine_data.nb_port * sizeof(u_int16_t));
   thread_routine(&routine_data);
-  display_response(&routine_data, 1);
+  display_response(&routine_data, 1, data->display_all);
 }
 
 
