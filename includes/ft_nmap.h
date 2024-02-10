@@ -128,6 +128,7 @@ typedef struct {
   int       nb_port;
   t_scan    current_scan;
   char      *device;
+  pcap_t    *handle;
 } thread_data;
 
 typedef struct s_data {
@@ -138,6 +139,12 @@ typedef struct s_data {
   short speedup;     // default 0, max 250
   t_scan scanmask;   // SYN, NULL, ACK, FIN, XMAS, UDP
 } t_data;
+
+struct global_data {
+  thread_data *data;
+  int         threads;
+};
+
 
 // ******************* UTILS SECTIONS ******************* //
 

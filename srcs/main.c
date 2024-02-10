@@ -7,6 +7,12 @@
 #include <stdio.h>
 #include <time.h>
 
+#ifndef __USE_POSIX
+#define __USE_POSIX
+#endif
+
+#include <signal.h>
+
 char *get_devname_by_ip(pcap_if_t *alldevsp, u_int32_t ip) {
   char errbuf[PCAP_ERRBUF_SIZE];
   bpf_u_int32 netp, maskp;
@@ -85,10 +91,13 @@ void		ft_quicksort(uint16_t *tab, int len)
 	ft_quicksort(&tab[m], len - m);
 }
 
+struct global_data g_data;
+
 void run_routine(t_data *data, char *device, u_int32_t pubip, u_int32_t destip) {
   thread_data routine_data;
 
-  printf("running routine\n");
+  g_data.threads = 1;
+  g_data.data = &routine_data;
   ft_bzero(&routine_data, sizeof(thread_data));
   routine_data.device = device;
   routine_data.pubip = pubip;
@@ -110,15 +119,27 @@ static void display_time(struct timeval *start, char*host) {
   dprintf(1, "scanning: %s in %ld.%lds\n", host, total_time / 1000000, (total_time % 1000000) / 1000);
 }
 
+void alarm_handler(int sig) {
+  (void)sig;
+  printf("alarm\n");
+  for (int n = 0; n < g_data.threads; n++)
+    pcap_breakloop(g_data.data[n].handle);
+}
 
 int main(int argc, char **argv) {
   t_data data;
   char error_buffer[PCAP_ERRBUF_SIZE];
   pcap_if_t *alldevsp;
   u_int32_t pubip;
+  struct timeval start_time;
+  struct sigaction new, old;
   char      *dev;
   int       n;
 
+  ft_bzero(&new, sizeof(struct sigaction));
+  new.sa_handler = &alarm_handler;
+  new.sa_flags = SA_INTERRUPT;
+  sigaction(SIGALRM, &new, &old);
   if (!parse_arguments(argc, argv, &data)) return (1);
   print_data(&data);
   ft_quicksort(data.ports, data.ports_number);
@@ -131,14 +152,13 @@ int main(int argc, char **argv) {
   }
 
   n = -1;
-  struct timeval start_time;
   while (data.ip_address[++n]) {
     dprintf(1, "\nscanning: %s\n", data.ip_address[n]);
     gettimeofday(&start_time, NULL);
 
-    pubip = get_public_ip(data.ip_address[n]);
-    if (!pubip) continue ;
-    if (!(dev = get_devname_by_ip(alldevsp, pubip))) continue;
+    if (!(pubip = get_public_ip(data.ip_address[n])) ||
+      !(dev = get_devname_by_ip(alldevsp, pubip)))
+      continue;
     uint32_t destAddr = htoi(data.ip_address[n]);
     if (data.speedup)
       dispatch_thread(&data, dev, pubip, destAddr);

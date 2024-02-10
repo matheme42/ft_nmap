@@ -1,6 +1,8 @@
 #include "ft_nmap.h"
 #include <signal.h>
 
+extern struct global_data g_data;
+
 int get_packet_port(t_trame *trame) {
   char *data;
 
@@ -128,6 +130,7 @@ void *thread_routine(void *ptr) {
     !(socket = create_socket(IPPROTO_TCP)) ||
     !(handle = pcap_open_live(data->device, BUFSIZ, -1, timeout_limit, error_buffer)))
     return (NULL);
+  data->handle = handle;
   set_filter(handle, data);
   for (int i = 0; i < 6; i++) {
     data->current_scan.mask = 0;
@@ -139,10 +142,12 @@ void *thread_routine(void *ptr) {
     else if (i == 5) data->current_scan.type.xmas = data->scan.type.xmas;
     if (data->current_scan.mask == 0) continue;
     send_packets(data, socket);
+    alarm(1);
     int ret = pcap_dispatch(handle, 0, my_packet_handler, ptr);
     if (ret < data->nb_port && data->destip == 16777343)
       pcap_dispatch(handle, 0, my_packet_handler, ptr);
   }
+  data->handle = 0;
   pcap_close(handle);
   close(socket);
   return NULL;
