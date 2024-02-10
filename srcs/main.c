@@ -153,12 +153,12 @@ int main(int argc, char **argv) {
 
   n = -1;
   while (data.ip_address[++n]) {
-    dprintf(1, "\nscanning: %s\n", data.ip_address[n]);
     gettimeofday(&start_time, NULL);
 
     if (!(pubip = get_public_ip(data.ip_address[n])) ||
       !(dev = get_devname_by_ip(alldevsp, pubip)))
       continue;
+    dprintf(1, "\nscanning: %s\n", data.ip_address[n]);
     uint32_t destAddr = htoi(data.ip_address[n]);
     if (data.speedup)
       dispatch_thread(&data, dev, pubip, destAddr);
