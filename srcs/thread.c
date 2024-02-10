@@ -144,10 +144,12 @@ void *thread_routine(void *ptr) {
     send_packets(data, socket);
     alarm(1);
     int ret = pcap_dispatch(handle, 0, my_packet_handler, ptr);
-    if (ret < data->nb_port && data->destip == 16777343)
-      pcap_dispatch(handle, 0, my_packet_handler, ptr);
+    if (ret > 612) {
+      alarm(1);
+      ret = pcap_dispatch(handle, 0, my_packet_handler, ptr);
+    }
   }
-  data->handle = 0;
+  data->handle = 0; //maybe mutex lock here for alarm
   pcap_close(handle);
   close(socket);
   return NULL;
@@ -157,8 +159,9 @@ void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desi
   pthread_t thread[MAX_SPEEDUP];
   thread_data thread_data[MAX_SPEEDUP];
 
+  g_data.threads = data->speedup;
+  g_data.data = thread_data;
   ft_bzero(thread_data, sizeof(thread_data));
-
   float threadPortRange = data->ports_number / (float)data->speedup;
   for (int n = 0; n < data->speedup; n++) {
     thread_data[n].device = device;
@@ -173,6 +176,6 @@ void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desi
 
   for (int n = 0; n < data->speedup; n++)
     pthread_join(thread[n], NULL);
-
+  alarm(0);
   display_response(thread_data, data->speedup, data->display_all, data->scanmask);
 }

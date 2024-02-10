@@ -106,6 +106,7 @@ void run_routine(t_data *data, char *device, u_int32_t pubip, u_int32_t destip) 
   routine_data.nb_port = data->ports_number;
   ft_memcpy(routine_data.ports, data->ports, routine_data.nb_port * sizeof(u_int16_t));
   thread_routine(&routine_data);
+  alarm(0);
   display_response(&routine_data, 1, data->display_all, data->scanmask);
 }
 
@@ -121,9 +122,9 @@ static void display_time(struct timeval *start, char*host) {
 
 void alarm_handler(int sig) {
   (void)sig;
-  printf("alarm\n");
   for (int n = 0; n < g_data.threads; n++)
-    pcap_breakloop(g_data.data[n].handle);
+    if (g_data.data[n].handle)
+      pcap_breakloop(g_data.data[n].handle);
 }
 
 int main(int argc, char **argv) {
@@ -138,7 +139,6 @@ int main(int argc, char **argv) {
 
   ft_bzero(&new, sizeof(struct sigaction));
   new.sa_handler = &alarm_handler;
-  new.sa_flags = SA_INTERRUPT;
   sigaction(SIGALRM, &new, &old);
   if (!parse_arguments(argc, argv, &data)) return (1);
   print_data(&data);
