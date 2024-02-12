@@ -149,7 +149,9 @@ void *thread_routine(void *ptr) {
       ret = pcap_dispatch(handle, 0, my_packet_handler, ptr);
     }
   }
+  pthread_mutex_lock(&g_mutex);
   data->handle = 0; //maybe mutex lock here for alarm
+  pthread_mutex_unlock(&g_mutex);
   pcap_close(handle);
   close(socket);
   return NULL;

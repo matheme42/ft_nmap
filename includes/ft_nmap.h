@@ -145,6 +145,8 @@ struct global_data {
   int         threads;
 };
 
+extern pthread_mutex_t g_mutex;
+
 
 // ******************* UTILS SECTIONS ******************* //
 

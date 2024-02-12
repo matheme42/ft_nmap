@@ -13,6 +13,8 @@
 
 #include <signal.h>
 
+pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 char *get_devname_by_ip(pcap_if_t *alldevsp, u_int32_t ip) {
   char errbuf[PCAP_ERRBUF_SIZE];
   bpf_u_int32 netp, maskp;
@@ -122,9 +124,11 @@ static void display_time(struct timeval *start, char*host) {
 
 void alarm_handler(int sig) {
   (void)sig;
+  pthread_mutex_lock(&g_mutex);
   for (int n = 0; n < g_data.threads; n++)
     if (g_data.data[n].handle)
       pcap_breakloop(g_data.data[n].handle);
+  pthread_mutex_unlock(&g_mutex);
 }
 
 int main(int argc, char **argv) {
@@ -156,8 +160,10 @@ int main(int argc, char **argv) {
     gettimeofday(&start_time, NULL);
 
     if (!(pubip = get_public_ip(data.ip_address[n])) ||
-      !(dev = get_devname_by_ip(alldevsp, pubip)))
-      continue;
+      !(dev = get_devname_by_ip(alldevsp, pubip))) {
+        dprintf(2, "unable to contact: %s\n", data.ip_address[n]);
+        continue;
+      }
     dprintf(1, "\nscanning: %s\n", data.ip_address[n]);
     uint32_t destAddr = htoi(data.ip_address[n]);
     if (data.speedup)

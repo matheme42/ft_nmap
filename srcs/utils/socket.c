@@ -18,8 +18,8 @@ int create_socket(int protoType) {
   }
 
   // setting timeout of recv setting
-  timeout.tv_sec = 1;
-  timeout.tv_usec = 0;
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 300000;
 	setsockopt(sockId, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
   return (sockId);
 }
