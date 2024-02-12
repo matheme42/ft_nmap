@@ -42,6 +42,15 @@ static void display_line(t_scan scan, t_response response, int port) {
     dprintf(1, "\n");
 }
 
+
+
+static void display_time(struct timeval *start, struct timeval *end, char*host) {
+  long sec = end->tv_sec - start->tv_sec;
+  long ms = end->tv_usec - start->tv_usec;
+  long total_time = (sec * 1000000) + ms;
+  dprintf(1, "scanning: %s in %ld.%lds\n", host, total_time / 1000000, (total_time % 1000000) / 1000);
+}
+
 void display_response(thread_data threads[MAX_SPEEDUP], int speedup, bool all, t_scan scan) {
     thread_data *data;
 

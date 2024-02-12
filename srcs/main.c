@@ -95,8 +95,9 @@ void		ft_quicksort(uint16_t *tab, int len)
 
 struct global_data g_data;
 
-void run_routine(t_data *data, char *device, u_int32_t pubip, u_int32_t destip) {
+struct timeval run_routine(t_data *data, char *device, u_int32_t pubip, u_int32_t destip) {
   thread_data routine_data;
+  struct timeval end;
 
   g_data.threads = 1;
   g_data.data = &routine_data;
@@ -109,15 +110,16 @@ void run_routine(t_data *data, char *device, u_int32_t pubip, u_int32_t destip) 
   ft_memcpy(routine_data.ports, data->ports, routine_data.nb_port * sizeof(u_int16_t));
   thread_routine(&routine_data);
   alarm(0);
+
+  gettimeofday(&end, NULL);
   display_response(&routine_data, 1, data->display_all, data->scanmask);
+  return end;
 }
 
 
-static void display_time(struct timeval *start, char*host) {
-  struct timeval end;
-  gettimeofday(&end, NULL);
-  long sec = end.tv_sec - start->tv_sec;
-  long ms = end.tv_usec - start->tv_usec;
+static void display_time(struct timeval *start, struct timeval *end, char*host) {
+  long sec = end->tv_sec - start->tv_sec;
+  long ms = end->tv_usec - start->tv_usec;
   long total_time = (sec * 1000000) + ms;
   dprintf(1, "scanning: %s in %ld.%lds\n", host, total_time / 1000000, (total_time % 1000000) / 1000);
 }
@@ -136,7 +138,7 @@ int main(int argc, char **argv) {
   char error_buffer[PCAP_ERRBUF_SIZE];
   pcap_if_t *alldevsp;
   u_int32_t pubip;
-  struct timeval start_time;
+  struct timeval start_time, end_time;
   struct sigaction new, old;
   char      *dev;
   int       n;
@@ -166,11 +168,8 @@ int main(int argc, char **argv) {
       }
     dprintf(1, "\nscanning: %s\n", data.ip_address[n]);
     uint32_t destAddr = htoi(data.ip_address[n]);
-    if (data.speedup)
-      dispatch_thread(&data, dev, pubip, destAddr);
-    else
-      run_routine(&data, dev, pubip, destAddr);
-    display_time(&start_time, data.ip_address[n]);
+    end_time = data.speedup ? dispatch_thread(&data, dev, pubip, destAddr) : run_routine(&data, dev, pubip, destAddr);
+    display_time(&start_time, &end_time, data.ip_address[n]);
   }
   free_tab(data.ip_address);
   pcap_freealldevs(alldevsp);

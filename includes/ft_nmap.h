@@ -224,7 +224,7 @@ bool parse_arguments(int ac, char **av, t_data *data);
 
 void send_packets(thread_data *data, int socket);
 void *thread_routine(void *ptr);
-void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip);
+struct timeval dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip);
 void my_packet_handler(u_char *args, const struct pcap_pkthdr *packet_header, const u_char *packet_body);
 void print_packet_info(t_trame *trame, struct pcap_pkthdr packet_header);
 void display_response(thread_data thread_data[MAX_SPEEDUP], int speedup, bool all, t_scan scan);

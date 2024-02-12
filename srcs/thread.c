@@ -157,9 +157,10 @@ void *thread_routine(void *ptr) {
   return NULL;
 }
 
-void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip) {
+struct timeval dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desip) {
   pthread_t thread[MAX_SPEEDUP];
   thread_data thread_data[MAX_SPEEDUP];
+  struct timeval end;
 
   g_data.threads = data->speedup;
   g_data.data = thread_data;
@@ -179,5 +180,8 @@ void dispatch_thread(t_data *data, char *device, u_int32_t pubip, u_int32_t desi
   for (int n = 0; n < data->speedup; n++)
     pthread_join(thread[n], NULL);
   alarm(0);
+  
+  gettimeofday(&end, NULL);
   display_response(thread_data, data->speedup, data->display_all, data->scanmask);
+  return end;
 }
